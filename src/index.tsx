@@ -20,5 +20,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
-export { FormItemMemo } from '@/form-tea/index'
-export * from '@/form-tea/update'
+export { FormItemMemo } from './form-tea/index'
+export * from './form-tea/type'
+export * from './form-tea/update'
+export * from './form-tea/util'
+export * from './form-tea/validation'
+export * from './form-tea/view'
+
