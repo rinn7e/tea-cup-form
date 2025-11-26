@@ -10,7 +10,7 @@
     "prettify": "prettier --write .",
     "clean": "rimraf lib",
     "test": "echo \"Warning: no test specified\" && exit 0",
-    "compile": "tsc",
+    "compile": "tsup",
     "build": "npm run clean && npm run test && npm run compile",
     "watch:ts": "tsc -w",
     "prepare": "npm run compile"
