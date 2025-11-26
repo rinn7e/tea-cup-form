@@ -12,7 +12,8 @@
     "test": "echo \"Warning: no test specified\" && exit 0",
     "compile": "tsc",
     "build": "npm run clean && npm run test && npm run compile",
-    "watch:ts": "tsc -w"
+    "watch:ts": "tsc -w",
+    "prepare": "npm run compile"
   },
   "peerDependencies": {
     "fp-ts": "^2.16.11",
