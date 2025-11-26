@@ -1,0 +1,32 @@
+{
+  "name": "tea-cup-form",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Moremi Vannak",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prettify": "prettier --write .",
+    "clean": "rimraf dist",
+    "test": "echo \"Warning: no test specified\" && exit 0",
+    "compile": "tsc",
+    "build": "npm run clean && npm run test && npm run compile",
+    "watch:ts": "tsc -w"
+  },
+  "peerDependencies": {
+    "fp-ts": "^2.16.11",
+    "react": "^19.2.0",
+    "react-datepicker": "^8.9.0",
+    "react-dom": "^19.2.0",
+    "react-tea-cup": "^5.1.1",
+    "tea-cup-fp": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "rimraf": "^6.1.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}
