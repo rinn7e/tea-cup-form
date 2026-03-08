@@ -22,7 +22,7 @@ SOFTWARE. */
 import * as O from 'fp-ts/lib/Option'
 import { useEffect, useState } from 'react'
 
-import { mkObjComparable } from '../util/util'
+import { mkObjComparable } from '../util/common'
 import { errorPopupContainer } from './helper'
 import { Props } from './type'
 

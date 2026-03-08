@@ -24,11 +24,7 @@ import * as M from 'fp-ts/lib/Map'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/function'
 import * as S from 'fp-ts/lib/string'
-import 'react-datepicker/dist/react-datepicker.css'
 
-import { modifyAtIfExist } from '../util/util'
-// Custom CSS for calendar
-import './form.css'
 import {
   type CalendarType,
   type CheckboxType,
@@ -39,8 +35,11 @@ import {
   type Msg,
   type RadioType,
 } from './type'
-import { updateValueTextType } from './util'
+import { modifyAtIfExist } from './util/common'
+import { updateValueTextType } from './util/util'
 import { addFiles } from './view'
+
+export * from './type'
 
 export const init = (initialForms: Forms): Model => ({
   forms: initialForms,
@@ -286,6 +285,6 @@ export const update =
   }
 
 export * from './type'
-export * from './util'
+export * from './util/util'
 export * from './validation'
 export * from './view'

@@ -19,85 +19,198 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
-import * as A from 'fp-ts/lib/Array'
-import * as EqClass from 'fp-ts/lib/Eq'
-import { type Eq } from 'fp-ts/lib/Eq'
+import * as E from 'fp-ts/lib/Either'
 import * as M from 'fp-ts/lib/Map'
+import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/function'
+import * as S from 'fp-ts/lib/string'
+import { type CSSProperties, type JSX } from 'react'
 
-// Similar to haskell's `and`
-export const and: (as: Array<boolean>) => boolean = A.matchLeft(
-  () => true,
-  (x, xs) => x && and(xs),
-)
+import { type CalendarType, type FormType, type Forms } from '../type'
+import { modifyAtIfExist } from './common'
 
-// Similar to haskell's `or`
-export const or: (as: Array<boolean>) => boolean = A.matchLeft(
-  () => false,
-  (x, xs) => x || or(xs),
-)
-
-export const NullableEq = <A,>(aEq: EqClass.Eq<A>): EqClass.Eq<A | null> => ({
-  equals: (first, second) => {
-    if (first && second) return aEq.equals(first, second)
-    else if (first) return false
-    else if (second) return false
-    // If both are null return true
-    else return true
-  },
+export const defaultCalendarType = (): CalendarType => ({
+  _tag: 'CalendarType',
+  label: 'Calendar',
+  currentValue: null,
+  validation: (val) => E.right(val),
+  showValidation: false,
+  isFocus: false,
 })
 
-// Similar to `modifyAt` but leave the current map the way it is if the index is not found.
-export const modifyAtIfExist = <K,>(
-  E: Eq<K>,
-): (<A>(k: K, f: (a: A) => A) => (m: Map<K, A>) => Map<K, A>) => {
-  return (k, f) => (m) => {
-    const result = pipe(m, M.modifyAt(E)(k, f))
-    switch (result._tag) {
-      case 'Some':
-        return result.value
-      case 'None':
-        return m
-    }
+// export const defaultForms = new Map<string, FormType>([
+//   ['username', defaultTextType()],
+//   ['password', defaultTextType()],
+// ])
+
+/**
+ * Lookup `FormType` from a forms, throw error if it doesn't exist.
+ */
+export const lookupForm = (key: string, formEls: Forms): FormType => {
+  const result = M.lookup(S.Ord)(key)(formEls)
+  switch (result._tag) {
+    case 'Some':
+      return result.value
+
+    default:
+      throw new Error(`lookupForm: Unable to find key ${key}`)
   }
 }
 
-export const emptyEl = <div />
-
-// Create valid html id from a normal string
-// Replace space with `_`
-// Only used the first 6 words
-export const mkIdFromString = (text: string): string => {
-  const amountOfWords = 6
-  return text.split(' ').splice(0, amountOfWords).join('_')
+export const lookupFormSafe = (
+  key: string,
+  formEls: Forms,
+): O.Option<FormType> => {
+  return M.lookup(S.Ord)(key)(formEls)
 }
 
 /**
- * Run a function that accepts no argument, useful when running if/else/switch function
- * `exec(() => 1 + 1)` is the same as `(() => 1 + 1)()`
- * Resemble fp-ts `Lazy.execute`.
+ * Update the value of `TextType`,  throw error if it is not.
  */
-export const exec = <A,>(f: () => A): A => f()
+export const updateValueTextType = (
+  value: string,
+  formType: FormType,
+): FormType => {
+  switch (formType._tag) {
+    case 'TextType':
+      return { ...formType, currentValue: value }
 
-/**
- * If the value has more than 2 decimal, rounded it to 2
- * If the value has less than 2 decimal, display .00 or .x0
- */
-export const limitDecimal2Digit = (value: number) => {
-  const result = (Math.round(value * 100) / 100).toFixed(2)
-  return result
+    default:
+      throw new Error(`updateValueTextType: not a TextType`)
+  }
 }
 
-// Given an object convert it to string, so it can be used as `useEffect` dependency
-// Note that
-// - `useEffect` only does shallow obj comparison that's why we need this.
-// - Shouldn't be used it with deep nested object.
-// - Shouldn't be used with 'props.<field>' where the <field> is used to initialize `State`.
-// - Shouldn't be used with `Map` (convert to array using M.toArray first)
-// - When used with `msgFromParent`, be sure to reset it to 'None' after handling it, otherwise
-// the same msgFromParent won't re-trigger the effect.
-// - Consider upgrading to this https://github.com/shuding/stable-hash,
-// if the current implementation is not good enough
-export const mkObjComparable = (obj: object | null): string => {
-  return JSON.stringify(obj)
+/**
+ * Extract the current value from a `TextType`, throw error if it is not.
+ */
+export const valueTextType = (formType: FormType): string => {
+  switch (formType._tag) {
+    case 'TextType':
+      return formType.currentValue
+    default:
+      throw new Error(
+        `valueTextType: Expect TextType but got ${formType._tag} instead.`,
+      )
+  }
+}
+
+/**
+ * Extract the current value from a `CalendarType`, throw error if it is not.
+ */
+export const valueCalendarType = (formType: FormType): Date | null => {
+  switch (formType._tag) {
+    case 'CalendarType':
+      return formType.currentValue
+    default:
+      throw new Error(
+        `valueCalendarType: Expect CalendarType but got ${formType._tag} instead.`,
+      )
+  }
+}
+
+/**
+ * Extract the current value from a `DropdownType`, throw error if it is not.
+ */
+export const valueDropdownType = (formType: FormType): string | null => {
+  switch (formType._tag) {
+    case 'DropdownType':
+      return formType.currentValue
+    default:
+      throw new Error(
+        `valueDropdownType: Expect DropdownType but got ${formType._tag} instead.`,
+      )
+  }
+}
+
+/**
+ * Extract the current value from a `FileType`, throw error if it is not.
+ */
+export const valueFileType = (formType: FormType): File[] => {
+  switch (formType._tag) {
+    case 'FileType':
+      return formType.currentValues
+    default:
+      throw new Error(
+        `valueFileType: Expect FileType but got ${formType._tag} instead.`,
+      )
+  }
+}
+
+/**
+ * Extract the current value from a `CheckboxType`, throw error if it is not.
+ */
+export const valueCheckboxType = (formType: FormType): [string, boolean][] => {
+  switch (formType._tag) {
+    case 'CheckboxType':
+      return formType.currentValues
+    default:
+      throw new Error(
+        `valueCheckboxType: Expect CheckboxType but got ${formType._tag} instead.`,
+      )
+  }
+}
+/**
+ * Extract the current value from a `RadioType`, throw error if it is not.
+ */
+export const valueRadioType = (formType: FormType): O.Option<string> => {
+  switch (formType._tag) {
+    case 'RadioType':
+      return formType.currentValue
+    default:
+      throw new Error(
+        `valueRadioType: Expect RadioType but got ${formType._tag} instead.`,
+      )
+  }
+}
+
+/**
+ * Modify the current value of a form type using `string`. Should be used for testing only.
+ */
+export const unsafeModifyFormValue =
+  (key: string, newVal: string) => (formEls: Forms) => {
+    return pipe(
+      formEls,
+      modifyAtIfExist(S.Eq)(key, (val) => {
+        switch (val._tag) {
+          case 'TextType':
+            return { ...val, currentValue: newVal }
+          case 'DropdownType':
+            return { ...val, currentValue: newVal }
+          case 'CalendarType':
+            return { ...val, currentValue: new Date(newVal) }
+          default:
+            throw new Error(`unsafeModifyFormValue: formType not supported`)
+        }
+      }),
+    )
+  }
+
+// Return a loading icon with specified color
+// sample color: #b2bbc6
+export const loadingIcon = (color: string, sizeInPx: number): JSX.Element => {
+  return (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      xmlnsXlink='http://www.w3.org/1999/xlink'
+      width={`${sizeInPx}px`}
+      height={`${sizeInPx}px`}
+      viewBox='0 0 100 100'
+      preserveAspectRatio='xMidYMid'
+      style={
+        { display: 'block', animationPlayState: 'paused' } as CSSProperties
+      }
+    >
+      <circle
+        cx='50'
+        cy='50'
+        fill='none'
+        stroke={color}
+        strokeWidth='10'
+        r='35'
+        strokeDasharray='164.93361431346415 56.97787143782138'
+        transform='matrix(1,0,0,1,0,0)'
+        style={{ animationPlayState: 'paused' } as CSSProperties}
+      ></circle>
+    </svg>
+  )
 }

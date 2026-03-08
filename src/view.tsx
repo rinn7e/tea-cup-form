@@ -29,19 +29,9 @@ import { pipe } from 'fp-ts/lib/function'
 import * as S from 'fp-ts/lib/string'
 import { type JSX } from 'react'
 import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
 import { Dispatcher } from 'tea-cup-fp'
 
-import { errorPopupContainer } from '../error-popup/helper'
-import {
-  emptyEl,
-  exec,
-  limitDecimal2Digit,
-  mkIdFromString,
-  modifyAtIfExist,
-} from '../util/util'
-// Custom CSS for calendar
-import './form.css'
+import { errorPopupContainer } from './error-popup/helper'
 import {
   type CheckboxChoice,
   type CheckboxType,
@@ -59,6 +49,13 @@ import {
   type RadioTypeUiArg,
   type TextType,
 } from './type'
+import {
+  emptyEl,
+  exec,
+  limitDecimal2Digit,
+  mkIdFromString,
+  modifyAtIfExist,
+} from './util/common'
 import { runValidationAndLink } from './validation'
 
 // UI for individual input field
@@ -204,7 +201,7 @@ export const formView = (
                   <div className='grow' style={{ maxWidth: '257px' }}>
                     <p className='overflow-hidden'>{file.name}</p>
                     <div className='flex text-sm opacity-40'>
-                      <p>{limitDecimal2Digit(file.size / 1000)} KB</p>.ui
+                      <p>{limitDecimal2Digit(file.size / 1000)} KB</p>
                       <p className='px-2 font-semibold'>⋅</p>
                       <p className='uppercase'>{file.type}</p>
                     </div>
@@ -381,8 +378,8 @@ const inputBoxView = <A,>(
     isFocus: boolean
   },
   validationResult: Either<string, A>,
-  inputElement: JSX.Element,
-  dropdownElement: JSX.Element,
+  inputElement: JSX.Element | null,
+  dropdownElement: JSX.Element | null,
 ) => {
   const [borderStyle, labelColor, showValidation] =
     validationResult._tag == 'Left' && val.showValidation

@@ -31,7 +31,7 @@ import * as S from 'fp-ts/lib/string'
 import { type FormEvent, type JSX, type MouseEvent } from 'react'
 import { Dispatcher } from 'tea-cup-fp'
 
-import { NullableEq } from '../util/util'
+import { NullableEq } from './util/common'
 
 export type Password = {
   revealPassword: boolean
