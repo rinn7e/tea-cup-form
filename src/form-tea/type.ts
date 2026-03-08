@@ -19,20 +19,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
-
 import * as A from 'fp-ts/lib/Array'
-import * as B from 'fp-ts/lib/boolean'
 import * as D from 'fp-ts/lib/Date'
 import { type Either } from 'fp-ts/lib/Either'
 import * as EqClass from 'fp-ts/lib/Eq'
 import * as Map from 'fp-ts/lib/Map'
 import * as O from 'fp-ts/lib/Option'
 import { type Option } from 'fp-ts/lib/Option'
+import * as B from 'fp-ts/lib/boolean'
 import * as S from 'fp-ts/lib/string'
 import { type FormEvent, type JSX, type MouseEvent } from 'react'
 import { Dispatcher } from 'tea-cup-fp'
 
-import { NullableEq } from '@/util/util'
+import { NullableEq } from '../util/util'
 
 export type Password = {
   revealPassword: boolean

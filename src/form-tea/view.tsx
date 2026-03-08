@@ -19,7 +19,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
-
 import * as A from 'fp-ts/lib/Array'
 import * as E from 'fp-ts/lib/Either'
 import { type Either } from 'fp-ts/lib/Either'
@@ -30,32 +29,37 @@ import { pipe } from 'fp-ts/lib/function'
 import * as S from 'fp-ts/lib/string'
 import { type JSX } from 'react'
 import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 import { Dispatcher } from 'tea-cup-fp'
 
-import { errorPopupContainer } from '@/error-popup/helper'
-import { radioView } from '@/shared/form-ui'
-import { emptyEl, exec, limitDecimal2Digit, mkIdFromString, modifyAtIfExist } from '@/util/util'
+import { errorPopupContainer } from '../error-popup/helper'
 import {
-  CustomTextInputProps,
-  Password,
+  emptyEl,
+  exec,
+  limitDecimal2Digit,
+  mkIdFromString,
+  modifyAtIfExist,
+} from '../util/util'
+// Custom CSS for calendar
+import './form.css'
+import {
   type CheckboxChoice,
   type CheckboxType,
   type CheckboxTypeUiArg,
+  CustomTextInputProps,
   type DropdownType,
   type DropdownTypeUiArg,
   type FileType,
   type FormType,
   type Model,
   type Msg,
+  Password,
   type RadioChoice,
   type RadioType,
   type RadioTypeUiArg,
   type TextType,
 } from './type'
 import { runValidationAndLink } from './validation'
-
-import 'react-datepicker/dist/react-datepicker.css'; // Custom CSS for calendar
-import './form.css'
 
 // UI for individual input field
 // Model is needed to do validation on input field that depend on another input field
@@ -107,8 +111,8 @@ export const formView = (
             }
           />
           <div className='relative'>
-            <div className='absolute right-0 pointer-events-none'>
-              <div className='py-[15px] px-[12px] flex items-center cursor-pointer opacity-40 hover:opacity-50'>
+            <div className='pointer-events-none absolute right-0'>
+              <div className='flex cursor-pointer items-center px-[12px] py-[15px] opacity-40 hover:opacity-50'>
                 <div style={{ width: '22px' }}>
                   <img src='../../assets/icons/calendar.svg' alt='calendar' />
                 </div>
@@ -201,7 +205,7 @@ export const formView = (
                     <p className='overflow-hidden'>{file.name}</p>
                     <div className='flex text-sm opacity-40'>
                       <p>{limitDecimal2Digit(file.size / 1000)} KB</p>.ui
-                      <p className='font-semibold px-2'>⋅</p>
+                      <p className='px-2 font-semibold'>⋅</p>
                       <p className='uppercase'>{file.type}</p>
                     </div>
                   </div>
@@ -266,35 +270,37 @@ export const disableInputView = (arg: {
 }) => {
   const popup = () => (
     <div className='flex flex-col items-center text-base'>
-      <div className='py-1.5 px-2 bg-sk-dark text-white rounded drop-shadow-lg z-10'>
-        <p className='text-center whitespace-pre-line'>
-          Contact Us
-        </p>
+      <div className='z-10 rounded bg-gray-900 px-2 py-1.5 text-white drop-shadow-lg'>
+        <p className='whitespace-pre-line text-center'>Contact Us</p>
       </div>
       <div className='relative'>
         <div
-          className='absolute arrow-down z-20'
-          style={{ borderTop: '6px solid rgba(42, 40, 46, 1)' }}
+          className='absolute z-20'
+          style={{
+            borderLeft: '6px solid transparent',
+            borderRight: '6px solid transparent',
+            borderTop: '6px solid #111827',
+          }}
         ></div>
       </div>
     </div>
   )
   return (
-    <div className='group bg-sk-dark-05 border border-transparent'>
+    <div className='group border border-transparent bg-gray-50'>
       {/* Popup */}
-      <div className='hidden group-hover:block w-full relative'>
-        <div className='w-full absolute' style={{ bottom: '10px' }}>
-          <div className='w-full flex flex-col items-center'>{popup()}</div>
+      <div className='relative hidden w-full group-hover:block'>
+        <div className='absolute w-full' style={{ bottom: '10px' }}>
+          <div className='flex w-full flex-col items-center'>{popup()}</div>
         </div>
       </div>
 
       {/* Input box */}
-      <div className='py-[6px] px-[12px] flex items-center'>
+      <div className='flex items-center px-[12px] py-[6px]'>
         <div>
-          <div className='text-[12px] leading-[14px] text-sk-dark-50'>
+          <div className='text-[12px] leading-[14px] text-gray-500'>
             {arg.label}
           </div>
-          <div className='text-[16px] leading-[24px] text-sk-dark-50'>
+          <div className='text-[16px] leading-[24px] text-gray-500'>
             {arg.val}
           </div>
         </div>
@@ -381,18 +387,18 @@ const inputBoxView = <A,>(
   const [borderStyle, labelColor, showValidation] =
     validationResult._tag == 'Left' && val.showValidation
       ? [
-          'border-sk-red focus-within:border-sk-red',
-          'text-sk-red',
+          'border-red-600 focus-within:border-red-600',
+          'text-red-600',
           O.some(validationResult.left),
         ]
       : [
-          'border-sk-dark-20 focus-within:border-sk-dark-70',
-          'text-sk-dark',
+          'border-gray-200 focus-within:border-gray-700',
+          'text-gray-900',
           O.none,
         ]
 
   return (
-    <div key={key} className='flex flex-col w-full'>
+    <div key={key} className='flex w-full flex-col'>
       {errorPopupContainer(showValidation, 'top', () =>
         dispatch({ _tag: 'HideValidation', key }),
       )}
@@ -401,11 +407,11 @@ const inputBoxView = <A,>(
         <div className='relative'>
           <p
             className={
-              `${labelColor} z-10 transition-all pointer-events-none absolute px-3 ` +
+              `${labelColor} pointer-events-none absolute z-10 px-3 transition-all ` +
               (val.isFocus ||
               (val.currentValue !== '' && val.currentValue !== null)
-                ? ' text-xs pt-1.5 opacity-100'
-                : ' text-base pt-3.5 opacity-50')
+                ? ' pt-1.5 text-xs opacity-100'
+                : ' pt-3.5 text-base opacity-50')
             }
           >
             {val.label}
@@ -441,7 +447,7 @@ export const defaultTextView = (
             ? 'password'
             : 'text'
         }
-        className='outline-none w-full px-3'
+        className='w-full px-3 outline-none'
         value={currentValue}
         onInput={(event) => dispatch({ _tag: 'UpdateForm', key, event })}
         onFocus={(_) => dispatch({ _tag: 'HandleFocus', key, isFocus: true })}
@@ -457,7 +463,7 @@ export const defaultTextView = (
         if (isPassword._tag === 'Some') {
           return (
             <div
-              className='p-3 flex items-center cursor-pointer opacity-100'
+              className='flex cursor-pointer items-center p-3 opacity-100'
               onClick={(event) =>
                 dispatch({
                   _tag: 'RevealPassword',
@@ -535,9 +541,7 @@ export const defaultCheckboxType = (
             <div
               id={mkIdFromString(key)}
               key={key}
-              className={`cursor-pointer flex flex-row ${
-                arg.isMarkdown ? 'items-start' : 'items-center'
-              }`}
+              className={`flex cursor-pointer flex-row ${arg.isMarkdown ? 'items-start' : 'items-center'}`}
               onClick={(_) =>
                 arg.dispatch({
                   _tag: 'ToggleCheckbox',
@@ -549,20 +553,32 @@ export const defaultCheckboxType = (
             >
               <div
                 className={`${
-                  arg.isMarkdown ? 'pt-[4px] ' : ''
-                } shrink-0 transition-all block cursor-pointer opacity-70 hover:opacity-100`}
+                  arg.isMarkdown ? 'pt-[4px]' : ''
+                } block shrink-0 cursor-pointer opacity-70 transition-all hover:opacity-100`}
               >
                 <div
                   className={`${
                     val ? 'block' : 'hidden'
-                  } shrink-0 w-[16px] h-[16px] border border-jj-blue-200 rounded-[2px] hover:border-jj-blue-300 cursor-pointer flex items-center justify-center bg-jj-blue-200 hover:bg-jj-blue-300`}
+                  } flex h-[16px] w-[16px] shrink-0 cursor-pointer items-center justify-center rounded-[2px] border border-blue-600 bg-blue-600 hover:border-blue-700 hover:bg-blue-700`}
                 >
-                  <div className='w-[14px] h-[14px] text-[14px] icon-check-small text-white'></div>
+                  <svg
+                    className='h-3 w-3 text-white'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={3}
+                      d='M5 13l4 4L19 7'
+                    />
+                  </svg>
                 </div>
                 <div
                   className={`${
                     !val ? 'block' : 'hidden'
-                  } shrink-0 w-[16px] h-[16px] border border-jj-dark-10 rounded-[2px] hover:border-jj-blue-200 cursor-pointer`}
+                  } h-[16px] w-[16px] shrink-0 cursor-pointer rounded-[2px] border border-gray-100 hover:border-blue-600`}
                 ></div>
               </div>
               <p className='pl-4'>
@@ -596,7 +612,7 @@ export const defaultRadioType = (
             <div
               id={mkIdFromString(arg.radioChoice.key)}
               key={arg.radioChoice.key}
-              className='cursor-pointer flex flex-row items-start'
+              className='flex cursor-pointer flex-row items-start'
               onClick={(_) =>
                 arg.dispatch({
                   _tag: 'UpdateRadio',
@@ -606,7 +622,7 @@ export const defaultRadioType = (
                 })
               }
             >
-              <div className='shrink-0 pt-[4px] transition-all block cursor-pointer opacity-70 hover:opacity-100'>
+              <div className='block shrink-0 cursor-pointer pt-[4px] opacity-70 transition-all hover:opacity-100'>
                 <div className={arg.isActive ? 'block' : 'hidden'}>
                   {radioView(true, () => null)}
                 </div>
@@ -621,6 +637,28 @@ export const defaultRadioType = (
           )
         },
   }
+}
+
+const radioView = (
+  isSelected: boolean,
+  onClick: (isSelected: boolean) => void,
+) => {
+  if (isSelected)
+    return (
+      <div
+        className='flex size-[20px] shrink-0 cursor-pointer items-center justify-center rounded-full border border-blue-600 hover:border-blue-700 lg:size-[16px]'
+        onClick={() => onClick(isSelected)}
+      >
+        <div className='size-[10px] rounded-full bg-blue-600 hover:bg-blue-700 lg:size-[8px]'></div>
+      </div>
+    )
+  else
+    return (
+      <div
+        className='size-[20px] shrink-0 cursor-pointer rounded-full border border-gray-300 hover:border-blue-600 lg:size-[16px]'
+        onClick={() => onClick(isSelected)}
+      ></div>
+    )
 }
 
 export const defaultDropdownType = (): DropdownType => ({
@@ -649,7 +687,7 @@ export const defaultDropdownType = (): DropdownType => ({
           <input
             id={mkIdFromString(label)} // id shouldn't have space
             style={{ paddingBottom: '6px', paddingTop: '22px' }}
-            className='outline-none w-full px-3 cursor-pointer'
+            className='w-full cursor-pointer px-3 outline-none'
             value={currentValue ? currentValue : ''}
             onKeyDown={(event) => event.preventDefault()}
             onClick={(_) =>
@@ -663,8 +701,8 @@ export const defaultDropdownType = (): DropdownType => ({
             }
           />
           <div className='relative'>
-            <div className='absolute right-0 pointer-events-none'>
-              <div className='pr-3 pt-5 flex items-center cursor-pointer opacity-30'>
+            <div className='pointer-events-none absolute right-0'>
+              <div className='flex cursor-pointer items-center pr-3 pt-5 opacity-30'>
                 <div style={{ width: '18px' }}>
                   <img
                     style={{ width: '18px' }}
@@ -681,19 +719,16 @@ export const defaultDropdownType = (): DropdownType => ({
 
     const dropdownElement = isFocus ? (
       <div className='relative'>
-        <div className='absolute w-full z-20' style={{ top: '10px' }}>
-          <div className='bg-white rounded-md shadow-lg overflow-hidden'>
-            <div
-              className='overflow-scroll scrollbar scrollbar-w-[8px] scrollbar-h-[8px] scrollbar-thumb-jj-dark-30'
-              style={{ maxHeight: '350px' }}
-            >
+        <div className='absolute z-20 w-full' style={{ top: '10px' }}>
+          <div className='overflow-hidden rounded-md bg-white shadow-lg'>
+            <div className='overflow-scroll' style={{ maxHeight: '350px' }}>
               {pipe(
                 choices,
                 A.map((choice) => (
                   <div
                     id={mkIdFromString(choice)}
                     key={choice}
-                    className='px-4 py-5 cursor-pointer hover:bg-sk-dark-20 transition-all'
+                    className='cursor-pointer px-4 py-5 transition-all hover:bg-gray-100'
                     onMouseDown={(event) =>
                       dispatch({
                         _tag: 'UpdateDropdownType',

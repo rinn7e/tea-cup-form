@@ -19,7 +19,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
-
 import * as E from 'fp-ts/lib/Either'
 import * as M from 'fp-ts/lib/Map'
 import * as O from 'fp-ts/lib/Option'
@@ -28,7 +27,7 @@ import * as S from 'fp-ts/lib/string'
 import { type CSSProperties, type JSX } from 'react'
 
 // Custom CSS for calendar
-import { modifyAtIfExist } from '@/util/util'
+import { modifyAtIfExist } from '../util/util'
 import { type CalendarType, type FormType, type Forms } from './type'
 
 export const defaultCalendarType = (): CalendarType => ({

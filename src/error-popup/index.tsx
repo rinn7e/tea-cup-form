@@ -19,11 +19,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
-
 import * as O from 'fp-ts/lib/Option'
 import { useEffect, useState } from 'react'
 
-import { mkObjComparable } from '@/util/util'
+import { mkObjComparable } from '../util/util'
 import { errorPopupContainer } from './helper'
 import { Props } from './type'
 

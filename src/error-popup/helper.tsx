@@ -19,7 +19,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
-
 import { type Option } from 'fp-ts/lib/Option'
 
 import { Direction } from './type'
@@ -27,8 +26,13 @@ import { Direction } from './type'
 export const arrowTop = () => (
   <div className='relative'>
     <div
-      className='absolute arrow-down z-20'
-      style={{ borderBottom: '6px solid rgba(229, 46, 4, 1)', top: '-6px' }}
+      className='absolute z-20'
+      style={{
+        borderLeft: '6px solid transparent',
+        borderRight: '6px solid transparent',
+        borderBottom: '6px solid #ef4444',
+        top: '-6px',
+      }}
     ></div>
   </div>
 )
@@ -36,8 +40,12 @@ export const arrowTop = () => (
 export const arrowDown = () => (
   <div className='relative'>
     <div
-      className='absolute arrow-down z-20'
-      style={{ borderTop: '6px solid rgba(229, 46, 4, 1)' }}
+      className='absolute z-20'
+      style={{
+        borderLeft: '6px solid transparent',
+        borderRight: '6px solid transparent',
+        borderTop: '6px solid #ef4444',
+      }}
     ></div>
   </div>
 )
@@ -50,9 +58,9 @@ export const errorPopupContainer = (
   const position = direction === 'bottom' ? 'top-[10px]' : 'bottom-[-20px]'
 
   return (
-    <div className='w-full relative'>
-      <div className={`w-full z-100 absolute pointer-events-none ${position}`}>
-        <div className='w-full flex flex-col items-center'>
+    <div className='relative w-full'>
+      <div className={`z-100 pointer-events-none absolute w-full ${position}`}>
+        <div className='flex w-full flex-col items-center'>
           {errorText._tag === 'Some'
             ? errorPopup(errorText.value, direction, onClick)
             : null}
@@ -69,12 +77,12 @@ export const errorPopup = (
 ) => {
   return (
     <div
-      className='flex flex-col items-center cursor-pointer pointer-events-auto'
+      className='pointer-events-auto flex cursor-pointer flex-col items-center'
       onClick={onClick}
     >
       {direction === 'bottom' ? arrowTop() : null}
-      <div className='py-[5px] px-[8px] bg-jj-red-200 text-white rounded drop-shadow-lg z-10'>
-        <p className='text-center whitespace-pre-line text-[14px] leading-[20px]'>
+      <div className='z-10 rounded bg-red-500 px-[8px] py-[5px] text-white drop-shadow-lg'>
+        <p className='whitespace-pre-line text-center text-[14px] leading-[20px]'>
           {errorText}
         </p>
       </div>

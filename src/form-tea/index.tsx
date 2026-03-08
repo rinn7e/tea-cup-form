@@ -19,16 +19,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
-
 import * as M from 'fp-ts/lib/Map'
 import * as S from 'fp-ts/lib/string'
 import { memo } from 'react'
+import 'react-datepicker/dist/react-datepicker.css'
 
+// Custom CSS for calendar
+import './form.css'
 import { PropEq, type Props } from './type'
 import { formView } from './view'
-
-import 'react-datepicker/dist/react-datepicker.css'; // Custom CSS for calendar
-import './form.css'
 
 const FormItem = ({ field, dispatch, model }: Props) => {
   const result = M.lookup(S.Ord)(field)(model.forms)

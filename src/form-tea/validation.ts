@@ -19,7 +19,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
-
 import * as A from 'fp-ts/lib/Array'
 import type { Either } from 'fp-ts/lib/Either'
 import * as E from 'fp-ts/lib/Either'
@@ -28,8 +27,8 @@ import type { Option } from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/function'
 import * as S from 'fp-ts/lib/string'
 
-import { and, or } from '@/util/util'
-import type { Forms, FormType, TextType } from './type'
+import { and, or } from '../util/util'
+import type { FormType, Forms, TextType } from './type'
 import { lookupForm, valueTextType } from './util'
 
 // Validator

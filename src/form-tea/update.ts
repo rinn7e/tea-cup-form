@@ -19,14 +19,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
-
 import * as A from 'fp-ts/lib/Array'
 import * as M from 'fp-ts/lib/Map'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/function'
 import * as S from 'fp-ts/lib/string'
+import 'react-datepicker/dist/react-datepicker.css'
 
-import { modifyAtIfExist } from '@/util/util'
+import { modifyAtIfExist } from '../util/util'
+// Custom CSS for calendar
+import './form.css'
 import {
   type CalendarType,
   type CheckboxType,
@@ -39,9 +41,6 @@ import {
 } from './type'
 import { updateValueTextType } from './util'
 import { addFiles } from './view'
-
-import 'react-datepicker/dist/react-datepicker.css'; // Custom CSS for calendar
-import './form.css'
 
 export const init = (initialForms: Forms): Model => ({
   forms: initialForms,
@@ -290,4 +289,3 @@ export * from './type'
 export * from './util'
 export * from './validation'
 export * from './view'
-

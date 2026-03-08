@@ -19,7 +19,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
-
 import * as A from 'fp-ts/lib/Array'
 import * as EqClass from 'fp-ts/lib/Eq'
 import { type Eq } from 'fp-ts/lib/Eq'
@@ -48,9 +47,10 @@ export const NullableEq = <A,>(aEq: EqClass.Eq<A>): EqClass.Eq<A | null> => ({
   },
 })
 
-
 // Similar to `modifyAt` but leave the current map the way it is if the index is not found.
-export const modifyAtIfExist = <K,>(E: Eq<K>,): (<A>(k: K, f: (a: A) => A) => (m: Map<K, A>) => Map<K, A>) => {
+export const modifyAtIfExist = <K,>(
+  E: Eq<K>,
+): (<A>(k: K, f: (a: A) => A) => (m: Map<K, A>) => Map<K, A>) => {
   return (k, f) => (m) => {
     const result = pipe(m, M.modifyAt(E)(k, f))
     switch (result._tag) {
@@ -61,7 +61,6 @@ export const modifyAtIfExist = <K,>(E: Eq<K>,): (<A>(k: K, f: (a: A) => A) => (m
     }
   }
 }
-
 
 export const emptyEl = <div />
 
