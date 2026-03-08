@@ -59,7 +59,7 @@ export const errorPopupContainer = (
 
   return (
     <div className='relative w-full'>
-      <div className={`z-100 pointer-events-none absolute w-full ${position}`}>
+      <div className={`pointer-events-none absolute z-100 w-full ${position}`}>
         <div className='flex w-full flex-col items-center'>
           {errorText._tag === 'Some'
             ? errorPopup(errorText.value, direction, onClick)
@@ -82,7 +82,7 @@ export const errorPopup = (
     >
       {direction === 'bottom' ? arrowTop() : null}
       <div className='z-10 rounded bg-red-500 px-[8px] py-[5px] text-white drop-shadow-lg'>
-        <p className='whitespace-pre-line text-center text-[14px] leading-[20px]'>
+        <p className='text-center text-[14px] leading-[20px] whitespace-pre-line'>
           {errorText}
         </p>
       </div>

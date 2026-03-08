@@ -268,7 +268,7 @@ export const disableInputView = (arg: {
   const popup = () => (
     <div className='flex flex-col items-center text-base'>
       <div className='z-10 rounded bg-gray-900 px-2 py-1.5 text-white drop-shadow-lg'>
-        <p className='whitespace-pre-line text-center'>Contact Us</p>
+        <p className='text-center whitespace-pre-line'>Contact Us</p>
       </div>
       <div className='relative'>
         <div
@@ -699,7 +699,7 @@ export const defaultDropdownType = (): DropdownType => ({
           />
           <div className='relative'>
             <div className='pointer-events-none absolute right-0'>
-              <div className='flex cursor-pointer items-center pr-3 pt-5 opacity-30'>
+              <div className='flex cursor-pointer items-center pt-5 pr-3 opacity-30'>
                 <div style={{ width: '18px' }}>
                   <img
                     style={{ width: '18px' }}

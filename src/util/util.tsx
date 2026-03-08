@@ -24,7 +24,6 @@ import * as M from 'fp-ts/lib/Map'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/function'
 import * as S from 'fp-ts/lib/string'
-import { type CSSProperties, type JSX } from 'react'
 
 import { type CalendarType, type FormType, type Forms } from '../type'
 import { modifyAtIfExist } from './common'
@@ -184,33 +183,3 @@ export const unsafeModifyFormValue =
       }),
     )
   }
-
-// Return a loading icon with specified color
-// sample color: #b2bbc6
-export const loadingIcon = (color: string, sizeInPx: number): JSX.Element => {
-  return (
-    <svg
-      xmlns='http://www.w3.org/2000/svg'
-      xmlnsXlink='http://www.w3.org/1999/xlink'
-      width={`${sizeInPx}px`}
-      height={`${sizeInPx}px`}
-      viewBox='0 0 100 100'
-      preserveAspectRatio='xMidYMid'
-      style={
-        { display: 'block', animationPlayState: 'paused' } as CSSProperties
-      }
-    >
-      <circle
-        cx='50'
-        cy='50'
-        fill='none'
-        stroke={color}
-        strokeWidth='10'
-        r='35'
-        strokeDasharray='164.93361431346415 56.97787143782138'
-        transform='matrix(1,0,0,1,0,0)'
-        style={{ animationPlayState: 'paused' } as CSSProperties}
-      ></circle>
-    </svg>
-  )
-}
