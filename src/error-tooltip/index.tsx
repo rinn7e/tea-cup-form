@@ -23,20 +23,20 @@ import * as O from 'fp-ts/lib/Option'
 import { useEffect, useState } from 'react'
 
 import { mkObjComparable } from '../util/common'
-import { errorPopupContainer } from './helper'
+import { errorTooltipContainer } from './helper'
 import { Props } from './type'
 
 // TODO: used this in `form2` hook.
-const ErrorPopup = (props: Props) => {
+const ErrorTooltip = (props: Props) => {
   const [status, setStatus] = useState(props.config.errorText)
 
   useEffect(() => {
     setStatus(props.config.errorText)
   }, [mkObjComparable(props.config)])
 
-  return errorPopupContainer(status, props.config.direction, () =>
+  return errorTooltipContainer(status, props.config.direction, () =>
     setStatus(O.none),
   )
 }
 
-export default ErrorPopup
+export default ErrorTooltip

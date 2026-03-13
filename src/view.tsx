@@ -31,7 +31,7 @@ import { type JSX } from 'react'
 import DatePicker from 'react-datepicker'
 import { Dispatcher } from 'tea-cup-fp'
 
-import { errorPopupContainer } from './error-popup/helper'
+import { errorTooltipContainer } from './error-tooltip/helper'
 import {
   type CheckboxChoice,
   type CheckboxType,
@@ -247,7 +247,7 @@ export const formView = (
             {currentFilesView()}
           </div>
 
-          {errorPopupContainer(showValidation, 'bottom', () =>
+          {errorTooltipContainer(showValidation, 'bottom', () =>
             dispatch({ _tag: 'HideValidation', key }),
           )}
         </div>
@@ -396,7 +396,7 @@ const inputBoxView = <A,>(
 
   return (
     <div key={key} className='flex w-full flex-col'>
-      {errorPopupContainer(showValidation, 'top', () =>
+      {errorTooltipContainer(showValidation, 'top', () =>
         dispatch({ _tag: 'HideValidation', key }),
       )}
 

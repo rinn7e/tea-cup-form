@@ -50,7 +50,7 @@ export const arrowDown = () => (
   </div>
 )
 
-export const errorPopupContainer = (
+export const errorTooltipContainer = (
   errorText: Option<string>,
   direction: Direction,
   onClick: () => void,
