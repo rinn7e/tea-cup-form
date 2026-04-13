@@ -8,14 +8,15 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "prettify": "prettier --write .",
     "clean": "rimraf lib",
-    "test": "echo \"Warning: no test specified\" && exit 0",
-    "lint": "eslint src",
     "compile": "tsup",
-    "build": "npm run clean && npm run test && npm run compile",
-    "watch:ts": "tsc -w",
-    "prepare": "npm run compile"
+    "build": "npm run clean && npm run compile",
+    "prepare": "npm run compile",
+    "typecheck": "tsc --noEmit",
+    "check-style": "prettier --check .",
+    "fix-style": "prettier --write .",
+    "lint": "eslint src",
+    "staged": "npm run fix-style && npm run typecheck && npm run lint"
   },
   "peerDependencies": {
     "fp-ts": "^2.16.11",
@@ -26,23 +27,23 @@
     "tea-cup-fp": "^1.1.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.22.0",
+    "@eslint/js": "^9.29.0",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "eslint": "^9.22.0",
-    "eslint-plugin-import": "^2.31.0",
+    "eslint": "^9.29.0",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react-dom": "^1.52.2",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
     "eslint-plugin-react-x": "^1.52.2",
-    "eslint-plugin-unused-imports": "^4.1.4",
+    "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^16.2.0",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "rimraf": "^6.1.2",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.26.0"
+    "typescript-eslint": "^8.34.1"
   }
 }

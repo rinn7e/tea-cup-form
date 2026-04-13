@@ -1,8 +1,4 @@
 dist/
-dist-auth
+lib/
 node_modules/
-size-plugin.json
 package-lock.json
-src/style/tailwind-output.css
-journal/
-src/generated

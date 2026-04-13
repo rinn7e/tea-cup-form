@@ -10,7 +10,7 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config([
-  globalIgnores(['dist', 'lib', 'src/generated', 'tsup.config.ts']),
+  globalIgnores(['dist', 'lib', 'src/generated']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -32,7 +32,9 @@ export default tseslint.config([
       ecmaVersion: 2020,
       globals: globals.browser,
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ['*.config.ts'],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
