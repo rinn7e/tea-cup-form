@@ -29,9 +29,6 @@ import './form.css'
 import { PropEq, type Props } from './type'
 import { formView } from './view'
 
-export * from './type'
-export * from './view'
-
 const FormItem = ({ field, dispatch, model }: Props) => {
   const result = M.lookup(S.Ord)(field)(model.forms)
   switch (result._tag) {

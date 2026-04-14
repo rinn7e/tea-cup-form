@@ -39,8 +39,6 @@ import { modifyAtIfExist } from './util/common'
 import { updateValueTextType } from './util/util'
 import { addFiles } from './view'
 
-export * from './type'
-
 export const init = (initialForms: Forms): Model => ({
   forms: initialForms,
   isDrag: false,
@@ -284,7 +282,4 @@ export const update =
     }
   }
 
-export * from './type'
-export * from './util/util'
-export * from './validation'
-export * from './view'
+
