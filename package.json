@@ -8,6 +8,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
+    "check:watch": "tsc --noEmit --watch",
     "clean": "rimraf lib",
     "compile": "tsup",
     "build": "npm run clean && npm run compile",

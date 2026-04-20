@@ -43,11 +43,12 @@ import {
   type FormType,
   type Model,
   type Msg,
-  Password,
   type RadioChoice,
   type RadioType,
   type RadioTypeUiArg,
   type TextType,
+  autocompleteToString,
+  textInputVariantToString,
 } from './type'
 import {
   emptyEl,
@@ -80,7 +81,8 @@ export const formView = (
         validation: val.validation,
         currentValue: val.currentValue,
         showValidation: val.showValidation,
-        isPassword: val.isPassword,
+        variant: val.variant,
+        autocomplete: val.autocomplete,
       })
     }
     case 'CalendarType': {
@@ -423,55 +425,47 @@ const inputBoxView = <A,>(
 }
 
 // Input box for text type
-export const defaultTextView = (
-  dispatch: (msg: Msg) => void,
-  isPassword: Option<Password>,
-  key: string,
-  currentValue: string,
-  label: string,
-  showValidation: boolean,
-  isFocus: boolean,
-  validation: (input: string) => Either<string, string>,
-  validationResult: Either<string, string>,
-): JSX.Element | null => {
+export const defaultTextView = ({
+  dispatch,
+  variant,
+  key,
+  currentValue,
+  label,
+  showValidation,
+  isFocus,
+  validation,
+  validationResult,
+  autocomplete,
+}: CustomTextInputProps): JSX.Element | null => {
   const inputElement = (
     <div className='flex flex-row'>
       <input
         style={{ paddingBottom: '6px', paddingTop: '22px' }}
-        type={
-          isPassword._tag === 'Some' &&
-          isPassword.value.revealPassword === false
-            ? 'password'
-            : 'text'
-        }
+        type={textInputVariantToString(variant)}
         className='w-full px-3 outline-none'
         value={currentValue}
         onInput={(event) => dispatch({ _tag: 'UpdateForm', key, event })}
         onFocus={(_) => dispatch({ _tag: 'HandleFocus', key, isFocus: true })}
         onBlur={(_) => dispatch({ _tag: 'HandleFocus', key, isFocus: false })}
         name={label}
-        autoComplete={
-          isPassword._tag === 'Some' && isPassword.value.disableAutocomplete
-            ? 'new-password'
-            : 'true'
-        }
+        autoComplete={autocompleteToString(autocomplete)}
       />
       {exec(() => {
-        if (isPassword._tag === 'Some') {
+        if (variant._tag === 'Password') {
           return (
             <div
               className='flex cursor-pointer items-center p-3 opacity-100'
               onClick={(event) =>
                 dispatch({
-                  _tag: 'RevealPassword',
+                  _tag: 'SetRevealPassword',
                   key,
-                  revealed: !isPassword.value,
+                  reveal: !variant.reveal,
                   event,
                 })
               }
             >
               <div style={{ width: '22px' }}>
-                {isPassword.value ? (
+                {variant.reveal ? (
                   <img
                     src='../../assets/icons/password-visible.svg'
                     alt='password'
@@ -517,7 +511,8 @@ export const defaultTextType = (
   showValidation: false,
   isTextarea: false,
   isFocus: false,
-  isPassword: O.none,
+  variant: { _tag: 'Text' },
+  autocomplete: false,
   ui: inputUi,
 })
 

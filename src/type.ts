@@ -33,15 +33,42 @@ import { Dispatcher } from 'tea-cup-fp'
 
 import { NullableEq } from './util/common'
 
-export type Password = {
-  revealPassword: boolean
-  disableAutocomplete: boolean
+// Text input variant
+// ------------------------------------------
+
+export type TextInputVariant =
+  | { _tag: 'Text' }
+  | { _tag: 'Email' }
+  | { _tag: 'Password'; reveal: boolean }
+
+export const TextInputVariantEq: EqClass.Eq<TextInputVariant> = {
+  equals: (x, y) => {
+    if (x._tag === 'Text' && y._tag === 'Text') return true
+    else if (x._tag === 'Email' && y._tag === 'Email') return true
+    else if (x._tag === 'Password' && y._tag === 'Password')
+      return EqClass.struct({
+        _tag: S.Eq,
+        reveal: B.Eq,
+      }).equals(x, y)
+    else return false
+  },
 }
 
-export const PasswordEq = EqClass.struct<Password>({
-  revealPassword: B.Eq,
-  disableAutocomplete: B.Eq,
-})
+export const textInputVariantToString = (variant: TextInputVariant) => {
+  switch (variant._tag) {
+    case 'Text':
+      return 'text'
+    case 'Email':
+      return 'email'
+    case 'Password': {
+      if (variant.reveal) return 'text'
+      else return 'password'
+    }
+  }
+}
+
+// TextType
+// ------------------------------------------
 
 export type TextType = {
   _tag: 'TextType'
@@ -59,24 +86,35 @@ export type TextType = {
   // ^ Validate the current input field with another input field (ie. repeat-password)
   showValidation: boolean
   isTextarea: boolean
-  isPassword: Option<Password>
+  variant: TextInputVariant
+  autocomplete: boolean
   isFocus: boolean
   ui: (props: CustomTextInputProps) => JSX.Element | null
 }
 
 export const TextTypeEq = EqClass.struct<TextType>({
   _tag: S.Eq,
-  placeholder: { equals: () => true },
-  label: { equals: () => true },
+  placeholder: S.Eq,
+  label: S.Eq,
   currentValue: S.Eq,
   validation: { equals: () => true },
   linkValidations: { equals: () => true },
   showValidation: B.Eq,
-  isTextarea: { equals: () => true },
-  isPassword: O.getEq(PasswordEq),
+  isTextarea: B.Eq,
+  variant: TextInputVariantEq,
+  autocomplete: B.Eq,
   isFocus: B.Eq,
   ui: { equals: () => true },
 })
+
+export const autocompleteToString = (val: boolean) => {
+  // `new-password` string can disable the browser auto complete
+  if (!val) return 'new-password'
+  else return ''
+}
+
+// CheckboxType
+// ------------------------------------------
 
 export type CheckboxChoice = [string, boolean]
 export const CheckboxChoiceEq = EqClass.tuple(S.Eq, B.Eq)
@@ -310,9 +348,9 @@ export type Msg =
     }
   | { _tag: 'HandleFocus'; key: string; isFocus: boolean }
   | {
-      _tag: 'RevealPassword'
+      _tag: 'SetRevealPassword'
       key: string
-      revealed: boolean
+      reveal: boolean
       event: MouseEvent<HTMLElement>
     }
   | {
@@ -348,5 +386,6 @@ export type CustomTextInputProps = {
   dispatch: (msg: Msg) => void
   validationResult: Either<string, string>
   validation: (input: string) => Either<string, string>
-  isPassword: Option<Password>
+  variant: TextInputVariant
+  autocomplete: boolean
 }

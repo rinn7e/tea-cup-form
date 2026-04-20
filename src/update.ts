@@ -34,6 +34,7 @@ import {
   type Model,
   type Msg,
   type RadioType,
+  TextInputVariant,
 } from './type'
 import { modifyAtIfExist } from './util/common'
 import { updateValueTextType } from './util/util'
@@ -221,7 +222,7 @@ export const update =
         )
         return { ...model, forms: newForms }
       }
-      case 'RevealPassword': {
+      case 'SetRevealPassword': {
         msg.event.preventDefault()
         const newForms = pipe(
           model.forms,
@@ -230,13 +231,13 @@ export const update =
               case 'TextType':
                 return {
                   ...formType,
-                  isPassword: pipe(
-                    formType.isPassword,
-                    O.map((isPassword) => ({
-                      ...isPassword,
-                      revealPassword: msg.revealed,
-                    })),
-                  ),
+                  variant:
+                    formType.variant._tag === 'Password'
+                      ? ({
+                          _tag: 'Password',
+                          reveal: msg.reveal,
+                        } satisfies TextInputVariant)
+                      : formType.variant,
                 }
               default:
                 return formType
@@ -281,5 +282,3 @@ export const update =
       }
     }
   }
-
-
