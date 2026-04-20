@@ -110,7 +110,7 @@ export const TextTypeEq = EqClass.struct<TextType>({
 export const autocompleteToString = (val: boolean) => {
   // `new-password` string can disable the browser auto complete
   if (!val) return 'new-password'
-  else return ''
+  else return 'on'
 }
 
 // CheckboxType
