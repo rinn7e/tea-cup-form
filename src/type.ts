@@ -388,4 +388,5 @@ export type CustomTextInputProps = {
   validation: (input: string) => Either<string, string>
   variant: TextInputVariant
   autocomplete: boolean
+  isTextarea: boolean
 }

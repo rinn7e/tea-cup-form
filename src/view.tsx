@@ -83,6 +83,7 @@ export const formView = (
         showValidation: val.showValidation,
         variant: val.variant,
         autocomplete: val.autocomplete,
+        isTextarea: val.isTextarea,
       })
     }
     case 'CalendarType': {
