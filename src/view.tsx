@@ -84,6 +84,7 @@ export const formView = (
         variant: val.variant,
         autocomplete: val.autocomplete,
         isTextarea: val.isTextarea,
+        onKeyDown: val.onKeyDown,
       })
     }
     case 'CalendarType': {
@@ -437,6 +438,7 @@ export const defaultTextView = ({
   validation,
   validationResult,
   autocomplete,
+  onKeyDown,
 }: CustomTextInputProps): JSX.Element | null => {
   const inputElement = (
     <div className='flex flex-row'>
@@ -448,6 +450,7 @@ export const defaultTextView = ({
         onInput={(event) => dispatch({ _tag: 'UpdateForm', key, event })}
         onFocus={(_) => dispatch({ _tag: 'HandleFocus', key, isFocus: true })}
         onBlur={(_) => dispatch({ _tag: 'HandleFocus', key, isFocus: false })}
+        onKeyDown={onKeyDown}
         name={label}
         autoComplete={autocompleteToString(autocomplete)}
       />

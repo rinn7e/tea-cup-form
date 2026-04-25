@@ -28,7 +28,12 @@ import * as O from 'fp-ts/lib/Option'
 import { type Option } from 'fp-ts/lib/Option'
 import * as B from 'fp-ts/lib/boolean'
 import * as S from 'fp-ts/lib/string'
-import { type FormEvent, type JSX, type MouseEvent } from 'react'
+import {
+  type FormEvent,
+  type JSX,
+  type KeyboardEvent,
+  type MouseEvent,
+} from 'react'
 import { Dispatcher } from 'tea-cup-fp'
 
 import { NullableEq } from './util/common'
@@ -89,6 +94,9 @@ export type TextType = {
   variant: TextInputVariant
   autocomplete: boolean
   isFocus: boolean
+  onKeyDown?: (
+    event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void
   ui: (props: CustomTextInputProps) => JSX.Element | null
 }
 
@@ -104,6 +112,7 @@ export const TextTypeEq = EqClass.struct<TextType>({
   variant: TextInputVariantEq,
   autocomplete: B.Eq,
   isFocus: B.Eq,
+  onKeyDown: { equals: () => true },
   ui: { equals: () => true },
 })
 
@@ -389,4 +398,7 @@ export type CustomTextInputProps = {
   variant: TextInputVariant
   autocomplete: boolean
   isTextarea: boolean
+  onKeyDown?: (
+    event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void
 }
