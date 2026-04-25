@@ -100,6 +100,71 @@ export type TextType = {
   ui: (props: CustomTextInputProps) => JSX.Element | null
 }
 
+export type CustomTextInputProps = {
+  key: string
+  label: string
+  isFocus: boolean
+  placeholder?: string
+  currentValue: string
+  showValidation: boolean
+  dispatch: (msg: Msg) => void
+  validationResult: Either<string, string>
+  validation: (input: string) => Either<string, string>
+  variant: TextInputVariant
+  autocomplete: boolean
+  isTextarea: boolean
+  onKeyDown?: (
+    event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void
+}
+
+// TextPillType
+// ------------------------------------------
+
+export type TextPillType = {
+  _tag: 'TextPillType'
+  placeholder: string
+  label: string
+  allValues: string[]
+  currentValue: string
+  validation: (input: string[]) => Either<string, string[]>
+  // ^ Validate the current input field with another input field (ie. repeat-password)
+  showValidation: boolean
+  isTextarea: boolean
+  autocomplete: boolean
+  isFocus: boolean
+  ui: (props: CustomTextPillInputProps) => JSX.Element | null
+}
+
+export const TextPillTypeEq = EqClass.struct<TextPillType>({
+  _tag: S.Eq,
+  placeholder: S.Eq,
+  label: S.Eq,
+  allValues: A.getEq(S.Eq),
+  currentValue: S.Eq,
+  validation: { equals: () => true },
+  showValidation: B.Eq,
+  isTextarea: B.Eq,
+  autocomplete: B.Eq,
+  isFocus: B.Eq,
+  ui: { equals: () => true },
+})
+
+export type CustomTextPillInputProps = {
+  key: string
+  label: string
+  isFocus: boolean
+  placeholder?: string
+  allValues: string[]
+  currentValue: string
+  showValidation: boolean
+  dispatch: (msg: Msg) => void
+  validationResult: Either<string, string[]>
+  validation: (input: string[]) => Either<string, string[]>
+  autocomplete: boolean
+  isTextarea: boolean
+}
+
 export const TextTypeEq = EqClass.struct<TextType>({
   _tag: S.Eq,
   placeholder: S.Eq,
@@ -264,6 +329,7 @@ export const FileTypeEq = EqClass.struct<FileType>({
 
 export type FormType =
   | TextType
+  | TextPillType
   | CheckboxType
   | RadioType
   | DropdownType
@@ -274,6 +340,8 @@ export const FormTypeEq: EqClass.Eq<FormType> = {
   equals: (x, y) => {
     if (x._tag === 'TextType' && y._tag === 'TextType')
       return TextTypeEq.equals(x, y)
+    else if (x._tag === 'TextPillType' && y._tag === 'TextPillType')
+      return TextPillTypeEq.equals(x, y)
     else if (x._tag === 'CheckboxType' && y._tag === 'CheckboxType')
       return CheckboxTypeEq.equals(x, y)
     else if (x._tag === 'RadioType' && y._tag === 'RadioType')
@@ -314,6 +382,20 @@ export const PropEq = EqClass.struct<Props>({
 })
 
 // Reducer
+
+export type TextPillMsg =
+  | {
+      _tag: 'UpdateTextPill'
+      event: FormEvent<HTMLInputElement | HTMLTextAreaElement>
+    }
+  | {
+      _tag: 'AddPill'
+      value: string
+    }
+  | {
+      _tag: 'RemovePill'
+      index: number
+    }
 
 export type Msg =
   | {
@@ -382,23 +464,28 @@ export type Msg =
       _tag: 'RemoveFormItem'
       value: string // key
     }
+  | {
+      _tag: 'TextPillMsg'
+      key: string
+      subMsg: TextPillMsg
+    }
 
 // helper types
 
-export type CustomTextInputProps = {
-  key: string
-  label: string
-  isFocus: boolean
-  placeholder?: string
-  currentValue: string
-  showValidation: boolean
-  dispatch: (msg: Msg) => void
-  validationResult: Either<string, string>
-  validation: (input: string) => Either<string, string>
-  variant: TextInputVariant
-  autocomplete: boolean
-  isTextarea: boolean
-  onKeyDown?: (
-    event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => void
-}
+// export type CustomTextInputProps = {
+//   key: string
+//   label: string
+//   isFocus: boolean
+//   placeholder?: string
+//   currentValue: string
+//   showValidation: boolean
+//   dispatch: (msg: Msg) => void
+//   validationResult: Either<string, string>
+//   validation: (input: string) => Either<string, string>
+//   variant: TextInputVariant
+//   autocomplete: boolean
+//   isTextarea: boolean
+//   onKeyDown?: (
+//     event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+//   ) => void
+// }

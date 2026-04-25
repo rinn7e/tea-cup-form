@@ -35,15 +35,43 @@ import {
   type Msg,
   type RadioType,
   TextInputVariant,
+  type TextPillMsg,
+  type TextPillType,
 } from './type'
 import { modifyAtIfExist } from './util/common'
-import { updateValueTextType } from './util/util'
+import { updateTextPillValue, updateValueTextType } from './util/util'
 import { addFiles } from './view'
 
 export const init = (initialForms: Forms): Model => ({
   forms: initialForms,
   isDrag: false,
 })
+
+export const textPillMsgHandler = (
+  msg: TextPillMsg,
+  form: TextPillType,
+): TextPillType => {
+  switch (msg._tag) {
+    case 'UpdateTextPill':
+      return updateTextPillValue(
+        (msg.event.target as HTMLInputElement).value,
+        form,
+      ) as TextPillType
+    case 'AddPill':
+      return {
+        ...form,
+        allValues: form.allValues.concat(msg.value),
+        currentValue: '',
+      }
+    case 'RemovePill':
+      return {
+        ...form,
+        allValues: pipe(form.allValues, A.deleteAt(msg.index), (res) =>
+          res._tag === 'Some' ? res.value : form.allValues,
+        ),
+      }
+  }
+}
 
 export const update =
   (msg: Msg) =>
@@ -53,12 +81,14 @@ export const update =
         if (msg.event && msg.event.target) {
           const newForm = pipe(
             model.forms,
-            modifyAtIfExist(S.Eq)(msg.key, (form) =>
-              updateValueTextType(
-                (msg.event.target as HTMLInputElement).value,
-                form,
-              ),
-            ),
+            modifyAtIfExist(S.Eq)(msg.key, (form) => {
+              if (form._tag === 'TextType') {
+                return updateValueTextType(
+                  (msg.event.target as HTMLInputElement).value,
+                  form,
+                )
+              } else return form
+            }),
           )
           return { ...model, forms: newForm }
         } else return model
@@ -66,9 +96,22 @@ export const update =
       case 'UpdateFormManual': {
         const newForm = pipe(
           model.forms,
-          modifyAtIfExist(S.Eq)(msg.key, (form) =>
-            updateValueTextType(msg.value, form),
-          ),
+          modifyAtIfExist(S.Eq)(msg.key, (form) => {
+            if (form._tag === 'TextType') {
+              return updateValueTextType(msg.value, form)
+            } else return form
+          }),
+        )
+        return { ...model, forms: newForm }
+      }
+      case 'TextPillMsg': {
+        const newForm = pipe(
+          model.forms,
+          modifyAtIfExist(S.Eq)(msg.key, (form) => {
+            if (form._tag === 'TextPillType') {
+              return textPillMsgHandler(msg.subMsg, form)
+            } else return form
+          }),
         )
         return { ...model, forms: newForm }
       }
@@ -209,6 +252,7 @@ export const update =
           modifyAtIfExist(S.Eq)(msg.key, (formType) => {
             if (
               formType._tag === 'TextType' ||
+              formType._tag === 'TextPillType' ||
               formType._tag === 'CalendarType' ||
               formType._tag === 'DropdownType'
             ) {
@@ -253,6 +297,7 @@ export const update =
           modifyAtIfExist(S.Eq)(msg.key, (formType) => {
             switch (formType._tag) {
               case 'TextType':
+              case 'TextPillType':
                 return { ...formType, showValidation: false }
               case 'FileType':
                 return { ...formType, showValidation: false }

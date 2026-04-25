@@ -208,6 +208,8 @@ export const notTheSameExtraValidation =
           switch (val._tag) {
             case 'TextType':
               return val.currentValue
+            case 'TextPillType':
+              return JSON.stringify(val.allValues)
             case 'CalendarType':
               return JSON.stringify(val.currentValue)
             case 'DropdownType':
@@ -243,6 +245,9 @@ export const runValidationForAll = (
       switch (val._tag) {
         case 'TextType': {
           return runValidationAndLink(val, forms)._tag === 'Right'
+        }
+        case 'TextPillType': {
+          return val.validation(val.allValues)._tag === 'Right'
         }
         case 'CalendarType': {
           return val.validation(val.currentValue)._tag === 'Right'
@@ -307,6 +312,8 @@ export const runValidation = (formType: FormType) => {
   switch (formType._tag) {
     case 'TextType':
       return formType.validation(formType.currentValue)
+    case 'TextPillType':
+      return formType.validation(formType.allValues)
     case 'CalendarType':
       return formType.validation(formType.currentValue)
     case 'DropdownType':

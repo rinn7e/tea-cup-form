@@ -47,6 +47,8 @@ import {
   type RadioType,
   type RadioTypeUiArg,
   type TextType,
+  type TextPillType,
+  type CustomTextPillInputProps,
   autocompleteToString,
   textInputVariantToString,
 } from './type'
@@ -85,6 +87,24 @@ export const formView = (
         autocomplete: val.autocomplete,
         isTextarea: val.isTextarea,
         onKeyDown: val.onKeyDown,
+      })
+    }
+    case 'TextPillType': {
+      const validationResult = val.validation(val.allValues)
+
+      return val.ui({
+        key,
+        dispatch,
+        label: val.label,
+        validationResult,
+        isFocus: val.isFocus,
+        placeholder: val.placeholder,
+        validation: val.validation,
+        allValues: val.allValues,
+        currentValue: val.currentValue,
+        showValidation: val.showValidation,
+        autocomplete: val.autocomplete,
+        isTextarea: val.isTextarea,
       })
     }
     case 'CalendarType': {
@@ -755,4 +775,20 @@ export const defaultDropdownType = (): DropdownType => ({
       dropdownElement,
     )
   },
+})
+
+export const defaultTextPillType = (
+  inputUi: (props: CustomTextPillInputProps) => JSX.Element | null,
+): TextPillType => ({
+  _tag: 'TextPillType',
+  placeholder: 'Tags',
+  label: 'Tags',
+  allValues: [],
+  currentValue: '',
+  validation: (val) => E.right(val),
+  showValidation: false,
+  isTextarea: false,
+  isFocus: false,
+  autocomplete: false,
+  ui: inputUi,
 })

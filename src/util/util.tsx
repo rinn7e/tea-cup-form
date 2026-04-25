@@ -80,6 +80,22 @@ export const updateValueTextType = (
 }
 
 /**
+ * Update the value of `TextPillType`,  throw error if it is not.
+ */
+export const updateTextPillValue = (
+  value: string,
+  formType: FormType,
+): FormType => {
+  switch (formType._tag) {
+    case 'TextPillType':
+      return { ...formType, currentValue: value }
+
+    default:
+      throw new Error(`updateTextPillValue: not a TextPillType`)
+  }
+}
+
+/**
  * Extract the current value from a `TextType`, throw error if it is not.
  */
 export const valueTextType = (formType: FormType): string => {
@@ -89,6 +105,20 @@ export const valueTextType = (formType: FormType): string => {
     default:
       throw new Error(
         `valueTextType: Expect TextType but got ${formType._tag} instead.`,
+      )
+  }
+}
+
+/**
+ * Extract the current pills from a `TextPillType`, throw error if it is not.
+ */
+export const valuePillTextType = (formType: FormType): string[] => {
+  switch (formType._tag) {
+    case 'TextPillType':
+      return formType.allValues
+    default:
+      throw new Error(
+        `valuePillTextType: Expect TextPillType but got ${formType._tag} instead.`,
       )
   }
 }
@@ -172,6 +202,7 @@ export const unsafeModifyFormValue =
       modifyAtIfExist(S.Eq)(key, (val) => {
         switch (val._tag) {
           case 'TextType':
+          case 'TextPillType':
             return { ...val, currentValue: newVal }
           case 'DropdownType':
             return { ...val, currentValue: newVal }
