@@ -97,7 +97,7 @@ export type TextType = {
   onKeyDown?: (
     event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void
-  ui: (props: CustomTextInputProps) => JSX.Element | null
+  ui?: (props: CustomTextInputProps) => JSX.Element
 }
 
 export type CustomTextInputProps = {
@@ -132,7 +132,7 @@ export type TextPillType = {
   isTextarea: boolean
   autocomplete: boolean
   isFocus: boolean
-  ui: (props: CustomTextPillInputProps) => JSX.Element | null
+  ui?: (props: CustomTextPillInputProps) => JSX.Element
 }
 
 export const TextPillTypeEq = EqClass.struct<TextPillType>({
@@ -204,7 +204,7 @@ export type CheckboxType = {
   currentValues: CheckboxChoice[] // Use array of tuple instead of map to maintain the order.
   validation: (input: CheckboxChoice[]) => Either<string, CheckboxChoice[]>
   isMarkdown: boolean // Option to render the text with markdown
-  ui: (arg: CheckboxTypeUiArg) => JSX.Element
+  ui?: (arg: CheckboxTypeUiArg) => JSX.Element
 }
 
 export const CheckboxTypeEq = EqClass.struct<CheckboxType>({
@@ -234,7 +234,7 @@ export type RadioType = {
   choices: RadioChoice[]
   currentValue: Option<string>
   isMarkdown: boolean // Option to render the text with markdown
-  ui: (arg: RadioTypeUiArg) => JSX.Element
+  ui?: (arg: RadioTypeUiArg) => JSX.Element
 }
 
 export const RadioTypeEq = EqClass.struct<RadioType>({
@@ -267,7 +267,7 @@ export type DropdownType = {
   validation: (input: string | null) => Either<string, string | null>
   showValidation: boolean
   isFocus: boolean
-  ui: (arg: DropdownTypeUiArg) => JSX.Element
+  ui?: (arg: DropdownTypeUiArg) => JSX.Element
 }
 
 export const DropdownTypeEq = EqClass.struct<DropdownType>({
@@ -282,6 +282,17 @@ export const DropdownTypeEq = EqClass.struct<DropdownType>({
   ui: { equals: () => true },
 })
 
+export type CalendarTypeUiArg = {
+  dispatch: (msg: Msg) => void
+  fieldKey: string
+  label: string
+  currentValue: Date | null
+  isFocus: boolean
+  validationResult: Either<string, Date | null>
+  validation: (input: Date | null) => Either<string, Date | null>
+  showValidation: boolean
+}
+
 export type CalendarType = {
   _tag: 'CalendarType'
   label: string
@@ -289,6 +300,7 @@ export type CalendarType = {
   validation: (input: Date | null) => Either<string, Date | null>
   showValidation: boolean
   isFocus: boolean
+  ui?: (arg: CalendarTypeUiArg) => JSX.Element
 }
 
 export const CalendarTypeEq = EqClass.struct<CalendarType>({
@@ -298,6 +310,7 @@ export const CalendarTypeEq = EqClass.struct<CalendarType>({
   validation: { equals: () => true },
   showValidation: { equals: () => true },
   isFocus: B.Eq,
+  ui: { equals: () => true },
 })
 
 export type FileType = {
@@ -306,13 +319,13 @@ export type FileType = {
   isMultiple: boolean
   showValidation: boolean
   validation: (input: File[]) => Either<string, File[]>
-  ui: (
+  ui?: (
     dispatch: (msg: Msg) => void,
     key: string,
     validation: Either<string, File[]>,
     isMultiple: boolean,
     isDrag: boolean,
-  ) => JSX.Element | null
+  ) => JSX.Element
 }
 
 export const FileEq: EqClass.Eq<File> = { equals: (a, b) => a.name === b.name }

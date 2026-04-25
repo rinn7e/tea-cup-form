@@ -24,9 +24,6 @@ import * as EqClass from 'fp-ts/lib/Eq'
 import { type Eq } from 'fp-ts/lib/Eq'
 import * as M from 'fp-ts/lib/Map'
 import { pipe } from 'fp-ts/lib/function'
-import { type JSX } from 'react'
-
-export const emptyEl = null as JSX.Element | null
 
 // Similar to haskell's `and`
 export const and: (as: Array<boolean>) => boolean = A.matchLeft(

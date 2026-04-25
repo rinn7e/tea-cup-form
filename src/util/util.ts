@@ -19,23 +19,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
-import * as E from 'fp-ts/lib/Either'
 import * as M from 'fp-ts/lib/Map'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/function'
 import * as S from 'fp-ts/lib/string'
 
-import { type CalendarType, type FormType, type Forms } from '../type'
+import { type FormType, type Forms } from '../type'
 import { modifyAtIfExist } from './common'
-
-export const defaultCalendarType = (): CalendarType => ({
-  _tag: 'CalendarType',
-  label: 'Calendar',
-  currentValue: null,
-  validation: (val) => E.right(val),
-  showValidation: false,
-  isFocus: false,
-})
 
 // export const defaultForms = new Map<string, FormType>([
 //   ['username', defaultTextType()],
