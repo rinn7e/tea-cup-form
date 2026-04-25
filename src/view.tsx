@@ -50,6 +50,36 @@ export {
   defaultTextType,
 } from './util/default-config'
 
+const IconFile = () => (
+  <svg
+    viewBox='0 0 24 24'
+    fill='none'
+    stroke='currentColor'
+    strokeWidth='2'
+    strokeLinecap='round'
+    strokeLinejoin='round'
+    className='h-8 w-8 text-slate-400'
+  >
+    <path d='M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z' />
+    <polyline points='13 2 13 9 20 9' />
+  </svg>
+)
+
+const IconX = () => (
+  <svg
+    viewBox='0 0 24 24'
+    fill='none'
+    stroke='currentColor'
+    strokeWidth='2'
+    strokeLinecap='round'
+    strokeLinejoin='round'
+    className='h-4 w-4'
+  >
+    <line x1='18' y1='6' x2='6' y2='18' />
+    <line x1='6' y1='6' x2='18' y2='18' />
+  </svg>
+)
+
 // UI for individual input field
 // Model is needed to do validation on input field that depend on another input field
 export const formView = (
@@ -176,32 +206,35 @@ export const formView = (
             A.mapWithIndex((i, file) => {
               return (
                 <div className='flex gap-4' key={i}>
-                  <div>
-                    <img
-                      className='object-contain'
-                      src={URL.createObjectURL(file)}
-                      style={{ height: '42px', width: '60px' }}
-                    />
+                  <div className='flex h-[42px] w-[60px] items-center justify-center rounded bg-slate-50'>
+                    {file.type.startsWith('image/') ? (
+                      <img
+                        className='h-full w-full object-contain'
+                        src={URL.createObjectURL(file)}
+                      />
+                    ) : (
+                      <IconFile />
+                    )}
                   </div>
                   <div className='grow' style={{ maxWidth: '257px' }}>
-                    <p className='overflow-hidden'>{file.name}</p>
-                    <div className='flex text-sm opacity-40'>
+                    <p className='truncate text-[13px] font-semibold text-slate-700'>
+                      {file.name}
+                    </p>
+                    <div className='flex text-xs text-slate-400'>
                       <p>{limitDecimal2Digit(file.size / 1000)} KB</p>
                       <p className='px-2 font-semibold'>⋅</p>
-                      <p className='uppercase'>{file.type}</p>
+                      <p className='uppercase'>{file.type.split('/')[1] || file.type}</p>
                     </div>
                   </div>
-                  <div
-                    className='cursor-pointer'
+                  <button
+                    type='button'
+                    className='flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-500'
                     onClick={() =>
                       dispatch({ _tag: 'RemoveFile', key, index: i })
                     }
                   >
-                    <img
-                      src='../../assets/icons/upload-cross.svg'
-                      alt='upload-cross'
-                    />
-                  </div>
+                    <IconX />
+                  </button>
                 </div>
               )
             }),

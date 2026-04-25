@@ -23,6 +23,7 @@ import * as E from 'fp-ts/lib/Either'
 import { type Either } from 'fp-ts/lib/Either'
 import { type Option } from 'fp-ts/lib/Option'
 import { type JSX } from 'react'
+import { Dispatcher } from 'tea-cup-fp'
 
 import {
   type CalendarType,
@@ -115,7 +116,7 @@ export const defaultCalendarType = (
 
 export const defaultFileType = (
   inputUi?: (
-    dispatch: (msg: Msg) => void,
+    dispatch: Dispatcher<Msg>,
     key: string,
     validation: Either<string, File[]>,
     isMultiple: boolean,

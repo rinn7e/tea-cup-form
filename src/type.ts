@@ -107,7 +107,7 @@ export type CustomTextInputProps = {
   placeholder?: string
   currentValue: string
   showValidation: boolean
-  dispatch: (msg: Msg) => void
+  dispatch: Dispatcher<Msg>
   validationResult: Either<string, string>
   validation: (input: string) => Either<string, string>
   variant: TextInputVariant
@@ -157,7 +157,7 @@ export type CustomTextPillInputProps = {
   allValues: string[]
   currentValue: string
   showValidation: boolean
-  dispatch: (msg: Msg) => void
+  dispatch: Dispatcher<Msg>
   validationResult: Either<string, string[]>
   validation: (input: string[]) => Either<string, string[]>
   autocomplete: boolean
@@ -193,7 +193,7 @@ export type CheckboxChoice = [string, boolean]
 export const CheckboxChoiceEq = EqClass.tuple(S.Eq, B.Eq)
 
 export type CheckboxTypeUiArg = {
-  dispatch: (msg: Msg) => void
+  dispatch: Dispatcher<Msg>
   fieldKey: string
   checkboxChoice: CheckboxChoice
   isMarkdown: boolean
@@ -223,7 +223,7 @@ export const RadioChoiceEq = EqClass.struct<RadioChoice>({
 })
 
 export type RadioTypeUiArg = {
-  dispatch: (msg: Msg) => void
+  dispatch: Dispatcher<Msg>
   fieldKey: string
   radioChoice: RadioChoice
   isActive: boolean
@@ -246,7 +246,7 @@ export const RadioTypeEq = EqClass.struct<RadioType>({
 })
 
 export type DropdownTypeUiArg = {
-  dispatch: (msg: Msg) => void
+  dispatch: Dispatcher<Msg>
   label: string
   currentValue: string | null
   placeholder: string
@@ -283,7 +283,7 @@ export const DropdownTypeEq = EqClass.struct<DropdownType>({
 })
 
 export type CalendarTypeUiArg = {
-  dispatch: (msg: Msg) => void
+  dispatch: Dispatcher<Msg>
   fieldKey: string
   label: string
   currentValue: Date | null
@@ -320,7 +320,7 @@ export type FileType = {
   showValidation: boolean
   validation: (input: File[]) => Either<string, File[]>
   ui?: (
-    dispatch: (msg: Msg) => void,
+    dispatch: Dispatcher<Msg>,
     key: string,
     validation: Either<string, File[]>,
     isMultiple: boolean,
@@ -491,7 +491,7 @@ export type Msg =
 //   placeholder?: string
 //   currentValue: string
 //   showValidation: boolean
-//   dispatch: (msg: Msg) => void
+//   dispatch: Dispatcher<Msg>
 //   validationResult: Either<string, string>
 //   validation: (input: string) => Either<string, string>
 //   variant: TextInputVariant

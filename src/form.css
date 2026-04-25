@@ -20,6 +20,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
+react-datepicker {
+  z-index: 40;
+}
+
 .react-datepicker__input-container > input {
   padding-top: 22px;
   padding-left: 12px;

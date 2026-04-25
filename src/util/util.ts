@@ -204,3 +204,24 @@ export const unsafeModifyFormValue =
       }),
     )
   }
+
+/**
+ * Set `showValidation` to `true` for all form types that support it.
+ */
+export const showAllValidation = (forms: Forms): Forms => {
+  return pipe(
+    forms,
+    M.map((val) => {
+      switch (val._tag) {
+        case 'TextType':
+        case 'TextPillType':
+        case 'CalendarType':
+        case 'DropdownType':
+        case 'FileType':
+          return { ...val, showValidation: true }
+        default:
+          return val
+      }
+    }),
+  )
+}

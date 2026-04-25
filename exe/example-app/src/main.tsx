@@ -1,7 +1,7 @@
+import { devTools } from '@rinn7e/tea-cup-prelude'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { Program } from 'react-tea-cup'
-
 import { Sub } from 'tea-cup-fp'
 
 import { view } from './component'
@@ -18,6 +18,7 @@ if (root) {
         update={update}
         view={view}
         subscriptions={() => Sub.none<Msg>()}
+        {...devTools<Model, Msg>().getProgramProps()}
       />
     </React.StrictMode>,
   )

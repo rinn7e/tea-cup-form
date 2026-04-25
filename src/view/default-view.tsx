@@ -26,8 +26,11 @@ import * as O from 'fp-ts/lib/Option'
 import { type Option } from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/function'
 import * as S from 'fp-ts/lib/string'
-import { type JSX } from 'react'
+import React, { type JSX } from 'react'
 import DatePicker from 'react-datepicker'
+// Custom CSS for calendar
+import 'react-datepicker/dist/react-datepicker.css'
+import { Dispatcher } from 'tea-cup-fp'
 
 import { errorTooltipContainer } from '../error-tooltip/helper'
 import {
@@ -42,63 +45,142 @@ import {
   textInputVariantToString,
 } from '../type'
 import { exec, mkIdFromString } from '../util/common'
+import './../form.css'
 import { emptyEl } from './common'
 
-// Generic input box, which is used for textType, dropdown, calendar ...
-export const inputBoxView = <A,>(
-  dispatch: (msg: Msg) => void,
-  key: string,
-  val: {
-    label: string
-    validation: (input: A) => Either<string, A>
-    currentValue: A
-    showValidation: boolean
-    isFocus: boolean
-  },
-  validationResult: Either<string, A>,
-  inputElement: JSX.Element,
-  dropdownElement: JSX.Element,
-) => {
-  const [borderStyle, labelColor, showValidation] =
-    validationResult._tag == 'Left' && val.showValidation
-      ? [
-          'border-red-600 focus-within:border-red-600',
-          'text-red-600',
-          O.some(validationResult.left),
-        ]
-      : [
-          'border-gray-200 focus-within:border-gray-700',
-          'text-gray-900',
-          O.none,
-        ]
+const CalendarInput = React.forwardRef<HTMLInputElement, any>((props, ref) => (
+  <input
+    {...props}
+    ref={ref}
+    className='w-full bg-transparent px-4 pt-6.5 pb-2.5 font-medium text-slate-800 outline-none'
+  />
+))
 
-  return (
-    <div key={key} className='flex w-full flex-col'>
-      {errorTooltipContainer(showValidation, 'top', () =>
-        dispatch({ _tag: 'HideValidation', key }),
-      )}
+// Icons
+// ------------------------------------------
 
-      <div className={`flex flex-col border ${borderStyle}`}>
-        <div className='relative'>
-          <p
-            className={
-              `${labelColor} pointer-events-none absolute z-10 px-3 transition-all ` +
-              (val.isFocus ||
-              (val.currentValue !== '' && val.currentValue !== null)
-                ? ' pt-1.5 text-xs opacity-100'
-                : ' pt-3.5 text-base opacity-50')
-            }
-          >
-            {val.label}
-          </p>
-        </div>
-        {inputElement}
-      </div>
+const IconChevronDown = () => (
+  <svg
+    viewBox='0 0 24 24'
+    fill='none'
+    stroke='currentColor'
+    strokeWidth='2'
+    strokeLinecap='round'
+    strokeLinejoin='round'
+    className='h-5 w-5'
+  >
+    <polyline points='6 9 12 15 18 9' />
+  </svg>
+)
 
-      {dropdownElement}
-    </div>
-  )
-}
+const IconCalendar = () => (
+  <svg
+    viewBox='0 0 24 24'
+    fill='none'
+    stroke='currentColor'
+    strokeWidth='2'
+    strokeLinecap='round'
+    strokeLinejoin='round'
+    className='h-5 w-5'
+  >
+    <rect x='3' y='4' width='18' height='18' rx='2' ry='2' />
+    <line x1='16' y1='2' x2='16' y2='6' />
+    <line x1='8' y1='2' x2='8' y2='6' />
+    <line x1='3' y1='10' x2='21' y2='10' />
+  </svg>
+)
+
+const IconUpload = () => (
+  <svg
+    viewBox='0 0 24 24'
+    fill='none'
+    stroke='currentColor'
+    strokeWidth='2'
+    strokeLinecap='round'
+    strokeLinejoin='round'
+    className='h-8 w-8'
+  >
+    <path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' />
+    <polyline points='17 8 12 3 7 8' />
+    <line x1='12' y1='3' x2='12' y2='15' />
+  </svg>
+)
+
+const IconEye = () => (
+  <svg
+    viewBox='0 0 24 24'
+    fill='none'
+    stroke='currentColor'
+    strokeWidth='2'
+    strokeLinecap='round'
+    strokeLinejoin='round'
+    className='h-5 w-5'
+  >
+    <path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z' />
+    <circle cx='12' cy='12' r='3' />
+  </svg>
+)
+
+const IconEyeOff = () => (
+  <svg
+    viewBox='0 0 24 24'
+    fill='none'
+    stroke='currentColor'
+    strokeWidth='2'
+    strokeLinecap='round'
+    strokeLinejoin='round'
+    className='h-5 w-5'
+  >
+    <path d='M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24' />
+    <line x1='1' y1='1' x2='23' y2='23' />
+  </svg>
+)
+
+const IconCheck = () => (
+  <svg
+    viewBox='0 0 24 24'
+    fill='none'
+    stroke='currentColor'
+    strokeWidth='3'
+    strokeLinecap='round'
+    strokeLinejoin='round'
+    className='h-3 w-3'
+  >
+    <polyline points='20 6 9 17 4 12' />
+  </svg>
+)
+
+// Helpers
+// ------------------------------------------
+
+const getContainerClasses = (isError: boolean, isFocus: boolean) =>
+  [
+    'flex flex-col rounded-xl border transition-all duration-200 relative',
+    isError
+      ? 'border-red-300 bg-red-50/30'
+      : isFocus
+        ? 'border-blue-500 ring-[3px] ring-blue-100 shadow-sm'
+        : 'border-slate-200 hover:border-slate-300 bg-white shadow-xs',
+  ].join(' ')
+
+const getLabelClasses = (
+  isError: boolean,
+  isFocus: boolean,
+  isFloating: boolean,
+) =>
+  [
+    'pointer-events-none absolute z-10 px-4 transition-all duration-200',
+    isFloating
+      ? 'pt-2 text-[11px] font-semibold tracking-wide uppercase'
+      : 'pt-4 text-base',
+    isError
+      ? 'text-red-500'
+      : isFocus
+        ? 'text-blue-500'
+        : isFloating
+          ? 'text-slate-500'
+          : 'text-slate-400',
+  ].join(' ')
 
 // Input box for text type
 export const defaultTextView = ({
@@ -109,71 +191,62 @@ export const defaultTextView = ({
   label,
   showValidation,
   isFocus,
-  validation,
   validationResult,
   autocomplete,
   onKeyDown,
 }: CustomTextInputProps): JSX.Element => {
-  const inputElement = (
-    <div className='flex flex-row'>
-      <input
-        style={{ paddingBottom: '6px', paddingTop: '22px' }}
-        type={textInputVariantToString(variant)}
-        className='w-full px-3 outline-none'
-        value={currentValue}
-        onInput={(event) => dispatch({ _tag: 'UpdateForm', key, event })}
-        onFocus={(_) => dispatch({ _tag: 'HandleFocus', key, isFocus: true })}
-        onBlur={(_) => dispatch({ _tag: 'HandleFocus', key, isFocus: false })}
-        onKeyDown={onKeyDown}
-        name={label}
-        autoComplete={autocompleteToString(autocomplete)}
-      />
-      {exec(() => {
-        if (variant._tag === 'Password') {
-          return (
-            <div
-              className='flex cursor-pointer items-center p-3 opacity-100'
-              onClick={(event) =>
-                dispatch({
-                  _tag: 'SetRevealPassword',
-                  key,
-                  reveal: !variant.reveal,
-                  event,
-                })
-              }
-            >
-              <div style={{ width: '22px' }}>
-                {variant.reveal ? (
-                  <img
-                    src='../../assets/icons/password-visible.svg'
-                    alt='password'
-                  />
-                ) : (
-                  <img
-                    src='../../assets/icons/password-hidden.svg'
-                    alt='password'
-                  />
-                )}
-              </div>
-            </div>
-          )
-        } else return emptyEl()
-      })}
+  const isError = validationResult._tag === 'Left' && showValidation
+  const isFloating = isFocus || currentValue !== ''
+  const errorMsg = isError ? O.some(validationResult.left) : O.none
+
+  return (
+    <div key={key} className='group flex w-full flex-col gap-1.5'>
+      {errorTooltipContainer(errorMsg, 'top', () =>
+        dispatch({ _tag: 'HideValidation', key }),
+      )}
+
+      <div className={getContainerClasses(isError, isFocus)}>
+        <p className={getLabelClasses(isError, isFocus, isFloating)}>{label}</p>
+        <div className='flex flex-row items-center'>
+          <input
+            style={{ paddingBottom: '10px', paddingTop: '26px' }}
+            type={textInputVariantToString(variant)}
+            className='w-full bg-transparent px-4 font-medium text-slate-800 outline-none placeholder:text-slate-300'
+            value={currentValue}
+            onInput={(event) => dispatch({ _tag: 'UpdateForm', key, event })}
+            onFocus={(_) =>
+              dispatch({ _tag: 'HandleFocus', key, isFocus: true })
+            }
+            onBlur={(_) =>
+              dispatch({ _tag: 'HandleFocus', key, isFocus: false })
+            }
+            onKeyDown={onKeyDown}
+            name={label}
+            autoComplete={autocompleteToString(autocomplete)}
+          />
+          {exec(() => {
+            if (variant._tag === 'Password') {
+              return (
+                <button
+                  type='button'
+                  className='mr-2 flex h-10 w-10 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus:outline-none'
+                  onClick={(event) =>
+                    dispatch({
+                      _tag: 'SetRevealPassword',
+                      key,
+                      reveal: !variant.reveal,
+                      event,
+                    })
+                  }
+                >
+                  {variant.reveal ? <IconEyeOff /> : <IconEye />}
+                </button>
+              )
+            } else return emptyEl()
+          })}
+        </div>
+      </div>
     </div>
-  )
-  return inputBoxView(
-    dispatch,
-    key,
-    {
-      label,
-      validation,
-      currentValue,
-      showValidation,
-      isFocus,
-    },
-    validationResult,
-    inputElement,
-    emptyEl(),
   )
 }
 
@@ -181,22 +254,24 @@ export const radioView = (
   isSelected: boolean,
   onClick: (isSelected: boolean) => void,
 ) => {
-  if (isSelected)
-    return (
+  return (
+    <div
+      className={[
+        'flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-all duration-200',
+        isSelected
+          ? 'border-blue-500 bg-blue-500'
+          : 'border-slate-300 bg-white group-hover:border-blue-400 hover:border-blue-400',
+      ].join(' ')}
+      onClick={() => onClick(isSelected)}
+    >
       <div
-        className='flex size-[20px] shrink-0 cursor-pointer items-center justify-center rounded-full border border-blue-600 hover:border-blue-700 lg:size-[16px]'
-        onClick={() => onClick(isSelected)}
-      >
-        <div className='size-[10px] rounded-full bg-blue-600 hover:bg-blue-700 lg:size-[8px]'></div>
-      </div>
-    )
-  else
-    return (
-      <div
-        className='size-[20px] shrink-0 cursor-pointer rounded-full border border-gray-300 hover:border-blue-600 lg:size-[16px]'
-        onClick={() => onClick(isSelected)}
+        className={[
+          'h-2 w-2 rounded-full bg-white transition-transform duration-200',
+          isSelected ? 'scale-100' : 'scale-0',
+        ].join(' ')}
       ></div>
-    )
+    </div>
+  )
 }
 
 export const defaultCheckboxView = (arg: CheckboxTypeUiArg) => {
@@ -205,7 +280,7 @@ export const defaultCheckboxView = (arg: CheckboxTypeUiArg) => {
     <div
       id={mkIdFromString(key)}
       key={key}
-      className={`flex cursor-pointer flex-row ${arg.isMarkdown ? 'items-start' : 'items-center'}`}
+      className='group flex cursor-pointer flex-row items-center gap-3 py-1.5'
       onClick={(_) =>
         arg.dispatch({
           _tag: 'ToggleCheckbox',
@@ -216,43 +291,25 @@ export const defaultCheckboxView = (arg: CheckboxTypeUiArg) => {
       }
     >
       <div
-        className={`${
-          arg.isMarkdown ? 'pt-[4px]' : ''
-        } block shrink-0 cursor-pointer opacity-70 transition-all hover:opacity-100`}
+        className={[
+          'flex h-5 w-5 shrink-0 items-center justify-center rounded-md border shadow-xs transition-all duration-200',
+          val
+            ? 'border-blue-500 bg-blue-500 text-white'
+            : 'border-slate-300 bg-white group-hover:border-blue-400',
+        ].join(' ')}
       >
         <div
-          className={`${
-            val ? 'block' : 'hidden'
-          } flex h-[16px] w-[16px] shrink-0 cursor-pointer items-center justify-center rounded-[2px] border border-blue-600 bg-blue-600 hover:border-blue-700 hover:bg-blue-700`}
+          className={[
+            'transform transition-all duration-200',
+            val ? 'scale-100 opacity-100' : 'scale-75 opacity-0',
+          ].join(' ')}
         >
-          <svg
-            className='h-3 w-3 text-white'
-            fill='none'
-            viewBox='0 0 24 24'
-            stroke='currentColor'
-          >
-            <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              strokeWidth={3}
-              d='M5 13l4 4L19 7'
-            />
-          </svg>
+          <IconCheck />
         </div>
-        <div
-          className={`${
-            !val ? 'block' : 'hidden'
-          } h-[16px] w-[16px] shrink-0 cursor-pointer rounded-[2px] border border-gray-100 hover:border-blue-600`}
-        ></div>
       </div>
-      <p className='pl-4'>
-        {arg.isMarkdown ? (
-          // isMarkdown is only supported in `haskell-certification`
-          <div>{key}</div>
-        ) : (
-          <div>{key}</div>
-        )}
-      </p>
+      <span className='text-[15px] font-medium text-slate-700 transition-colors select-none group-hover:text-slate-900'>
+        {key}
+      </span>
     </div>
   )
 }
@@ -262,7 +319,7 @@ export const defaultRadioView = (arg: RadioTypeUiArg) => {
     <div
       id={mkIdFromString(arg.radioChoice.key)}
       key={arg.radioChoice.key}
-      className='flex cursor-pointer flex-row items-start'
+      className='group flex cursor-pointer flex-row items-center gap-3 py-1.5'
       onClick={(_) =>
         arg.dispatch({
           _tag: 'UpdateRadio',
@@ -272,17 +329,15 @@ export const defaultRadioView = (arg: RadioTypeUiArg) => {
         })
       }
     >
-      <div className='block shrink-0 cursor-pointer pt-[4px] opacity-70 transition-all hover:opacity-100'>
-        <div className={arg.isActive ? 'block' : 'hidden'}>
-          {radioView(true, () => null)}
-        </div>
-        <div className={!arg.isActive ? 'block' : 'hidden'}>
-          {radioView(false, () => null)}
-        </div>
+      {radioView(arg.isActive, () => null)}
+      <div className='flex flex-col'>
+        <span className='text-[15px] font-medium text-slate-700 transition-colors select-none group-hover:text-slate-900'>
+          {arg.radioChoice.label}
+        </span>
+        {arg.radioChoice.desc && (
+          <span className='text-xs text-slate-400'>{arg.radioChoice.desc}</span>
+        )}
       </div>
-      <p className='pl-4'>
-        <div>{arg.radioChoice.label}</div>
-      </p>
     </div>
   )
 }
@@ -295,85 +350,81 @@ export const defaultDropdownView = ({
   isFocus,
   choices,
   validationResult,
-  validation,
   showValidation,
 }: DropdownTypeUiArg) => {
-  const inputElement = (
-    <div className='flex flex-col'>
-      <div className='flex flex-row'>
-        <input
-          id={mkIdFromString(label)} // id shouldn't have space
-          style={{ paddingBottom: '6px', paddingTop: '22px' }}
-          className='w-full cursor-pointer px-3 outline-none'
-          value={currentValue ? currentValue : ''}
-          onKeyDown={(event) => event.preventDefault()}
-          onClick={(_) =>
-            dispatch({ _tag: 'HandleFocus', key: fieldKey, isFocus: true })
-          }
-          onFocus={(_) =>
-            dispatch({ _tag: 'HandleFocus', key: fieldKey, isFocus: true })
-          }
-          onBlur={(_) =>
-            dispatch({ _tag: 'HandleFocus', key: fieldKey, isFocus: false })
-          }
-        />
+  const isError = validationResult._tag === 'Left' && showValidation
+  const isFloating = isFocus || (currentValue !== null && currentValue !== '')
+  const errorMsg = isError ? O.some(validationResult.left) : O.none
+
+  return (
+    <div key={fieldKey} className='group flex w-full flex-col gap-1.5'>
+      {errorTooltipContainer(errorMsg, 'top', () =>
+        dispatch({ _tag: 'HideValidation', key: fieldKey }),
+      )}
+
+      <div className={getContainerClasses(isError, isFocus)}>
+        <p className={getLabelClasses(isError, isFocus, isFloating)}>{label}</p>
+        <div className='flex flex-row items-center'>
+          <input
+            id={mkIdFromString(label)}
+            style={{ paddingBottom: '10px', paddingTop: '26px' }}
+            className='w-full cursor-pointer bg-transparent px-4 font-medium text-slate-800 outline-none'
+            value={currentValue ? currentValue : ''}
+            readOnly
+            onKeyDown={(event) => event.preventDefault()}
+            onClick={(_) =>
+              dispatch({ _tag: 'HandleFocus', key: fieldKey, isFocus: true })
+            }
+            onFocus={(_) =>
+              dispatch({ _tag: 'HandleFocus', key: fieldKey, isFocus: true })
+            }
+            onBlur={(_) =>
+              dispatch({ _tag: 'HandleFocus', key: fieldKey, isFocus: false })
+            }
+          />
+          <div className='pointer-events-none pr-3 text-slate-400 transition-colors group-hover:text-slate-600'>
+            <IconChevronDown />
+          </div>
+        </div>
+      </div>
+
+      {isFocus && (
         <div className='relative'>
-          <div className='pointer-events-none absolute right-0'>
-            <div className='flex cursor-pointer items-center pt-5 pr-3 opacity-30'>
-              <div style={{ width: '18px' }}>
-                <img
-                  style={{ width: '18px' }}
-                  src='../../assets/icons/chevron-down.svg'
-                  alt='chevron-down'
-                />
-              </div>
+          <div
+            className='animate-in fade-in zoom-in-95 absolute top-2 z-50 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl duration-200'
+            style={{ maxHeight: '350px' }}
+          >
+            <div className='scrollbar-hide overflow-y-auto py-1.5'>
+              {pipe(
+                choices,
+                A.map((choice) => (
+                  <div
+                    id={mkIdFromString(choice)}
+                    key={choice}
+                    className={[
+                      'mx-1.5 cursor-pointer rounded-lg px-3 py-2.5 text-[15px] font-medium transition-colors',
+                      currentValue === choice
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900',
+                    ].join(' ')}
+                    onMouseDown={(event) =>
+                      dispatch({
+                        _tag: 'UpdateDropdownType',
+                        key: fieldKey,
+                        value: choice,
+                        event,
+                      })
+                    }
+                  >
+                    {choice}
+                  </div>
+                )),
+              )}
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
-  )
-
-  const dropdownElement = isFocus ? (
-    <div className='relative'>
-      <div className='absolute z-20 w-full' style={{ top: '10px' }}>
-        <div className='overflow-hidden rounded-md bg-white shadow-lg'>
-          <div className='overflow-scroll' style={{ maxHeight: '350px' }}>
-            {pipe(
-              choices,
-              A.map((choice) => (
-                <div
-                  id={mkIdFromString(choice)}
-                  key={choice}
-                  className='cursor-pointer px-4 py-5 transition-all hover:bg-gray-100'
-                  onMouseDown={(event) =>
-                    dispatch({
-                      _tag: 'UpdateDropdownType',
-                      key: fieldKey,
-                      value: choice,
-                      event,
-                    })
-                  }
-                >
-                  {choice}
-                </div>
-              )),
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  ) : (
-    emptyEl()
-  )
-
-  return inputBoxView<string | null>(
-    dispatch,
-    fieldKey,
-    { label, currentValue, validation, isFocus, showValidation },
-    validationResult,
-    inputElement,
-    dropdownElement,
   )
 }
 
@@ -382,52 +433,22 @@ export const disableInputView = (arg: {
   val: string
   icon: Option<string>
 }) => {
-  const popup = () => (
-    <div className='flex flex-col items-center text-base'>
-      <div className='z-10 rounded bg-gray-900 px-2 py-1.5 text-white drop-shadow-lg'>
-        <p className='text-center whitespace-pre-line'>Contact Us</p>
-      </div>
-      <div className='relative'>
-        <div
-          className='absolute z-20'
-          style={{
-            borderLeft: '6px solid transparent',
-            borderRight: '6px solid transparent',
-            borderTop: '6px solid #111827',
-          }}
-        ></div>
-      </div>
-    </div>
-  )
   return (
-    <div className='group border border-transparent bg-gray-50'>
-      {/* Popup */}
-      <div className='relative hidden w-full group-hover:block'>
-        <div className='absolute w-full' style={{ bottom: '10px' }}>
-          <div className='flex w-full flex-col items-center'>{popup()}</div>
-        </div>
+    <div className='group flex items-center gap-4 rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3'>
+      <div className='flex flex-col'>
+        <span className='text-[10px] font-bold tracking-wider text-slate-400 uppercase'>
+          {arg.label}
+        </span>
+        <span className='text-[15px] font-semibold text-slate-500'>
+          {arg.val}
+        </span>
       </div>
-
-      {/* Input box */}
-      <div className='flex items-center px-[12px] py-[6px]'>
-        <div>
-          <div className='text-[12px] leading-[14px] text-gray-500'>
-            {arg.label}
-          </div>
-          <div className='text-[16px] leading-[24px] text-gray-500'>
-            {arg.val}
-          </div>
+      <div className='grow'></div>
+      {arg.icon._tag === 'Some' && (
+        <div className='text-slate-300'>
+          <IconChevronDown />
         </div>
-        <div className='grow'></div>
-        {arg.icon._tag === 'Some' ? (
-          <div className='opacity-30' style={{ width: '22px' }}>
-            <img
-              src={`../../assets/icons/${arg.icon.value}.svg`}
-              alt={arg.icon.value}
-            />
-          </div>
-        ) : null}
-      </div>
+      )}
     </div>
   )
 }
@@ -439,9 +460,13 @@ export const lookupWithDefaultHtml = (
   const result = M.lookup(S.Ord)(key)(formEls)
   switch (result._tag) {
     case 'Some':
-      return result.value
+      return result.value ?? <div>Empty</div>
     default:
-      return <div>Internal error</div>
+      return (
+        <div className='rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-500'>
+          Internal error: {key} not found
+        </div>
+      )
   }
 }
 
@@ -453,86 +478,104 @@ export const defaultCalendarView = ({
   isFocus,
   validationResult,
   showValidation,
-  validation,
 }: CalendarTypeUiArg) => {
-  const inputElement = (
-    <div className='flex flex-row'>
-      <DatePicker
-        showYearDropdown
-        scrollableYearDropdown
-        yearDropdownItemNumber={100}
-        maxDate={
-          new Date(new Date().setFullYear(new Date().getFullYear() - 18))
-        }
-        selected={currentValue}
-        placeholderText={isFocus ? 'DD.MM.YYYY' : ''}
-        dateFormat='dd.MM.yyyy'
-        onChange={(date) =>
-          dispatch({ _tag: 'UpdateCalendar', key: fieldKey, value: date })
-        }
-        onFocus={(_) =>
-          dispatch({ _tag: 'HandleFocus', key: fieldKey, isFocus: true })
-        }
-        onBlur={(_) =>
-          dispatch({ _tag: 'HandleFocus', key: fieldKey, isFocus: false })
-        }
-      />
-      <div className='relative'>
-        <div className='pointer-events-none absolute right-0'>
-          <div className='flex cursor-pointer items-center px-[12px] py-[15px] opacity-40 hover:opacity-50'>
-            <div style={{ width: '22px' }}>
-              <img src='../../assets/icons/calendar.svg' alt='calendar' />
-            </div>
+  const isError = validationResult._tag === 'Left' && showValidation
+  const isFloating = isFocus || currentValue !== null
+  const errorMsg = isError ? O.some(validationResult.left) : O.none
+
+  return (
+    <div key={fieldKey} className='group flex w-full flex-col gap-1.5'>
+      {errorTooltipContainer(errorMsg, 'top', () =>
+        dispatch({ _tag: 'HideValidation', key: fieldKey }),
+      )}
+
+      <div className={getContainerClasses(isError, isFocus)}>
+        <p className={getLabelClasses(isError, isFocus, isFloating)}>{label}</p>
+        <div className='flex flex-row items-center'>
+          <div className='w-full' onClick={(e) => e.stopPropagation()}>
+            <DatePicker
+              className='z-[100]'
+              showYearDropdown
+              scrollableYearDropdown
+              yearDropdownItemNumber={100}
+              selected={currentValue}
+              placeholderText={isFocus ? 'DD.MM.YYYY' : ''}
+              dateFormat='dd.MM.yyyy'
+              customInput={<CalendarInput />}
+              onCalendarOpen={() =>
+                dispatch(
+                  { _tag: 'HandleFocus', key: fieldKey, isFocus: true },
+                  false,
+                )
+              }
+              onCalendarClose={() =>
+                dispatch(
+                  { _tag: 'HandleFocus', key: fieldKey, isFocus: false },
+                  false,
+                )
+              }
+              onChange={(date) =>
+                dispatch(
+                  { _tag: 'UpdateCalendar', key: fieldKey, value: date },
+                  false,
+                )
+              }
+            />
+            {/* <DatePicker /> */}
+          </div>
+          <div className='pointer-events-none pr-3 text-slate-400 transition-colors group-hover:text-slate-600'>
+            <IconCalendar />
           </div>
         </div>
       </div>
     </div>
   )
-
-  return inputBoxView(
-    dispatch,
-    fieldKey,
-    { label, currentValue, validation, isFocus, showValidation },
-    validationResult,
-    inputElement,
-    emptyEl(),
-  )
 }
 
 export const defaultFileView = (
-  dispatch: (msg: Msg) => void,
+  dispatch: Dispatcher<Msg>,
   key: string,
   validation: Either<string, File[]>,
   isMultiple: boolean,
   isDrag: boolean,
 ) => {
+  const isError = validation._tag === 'Left'
+
   return (
     <div
-      className={`relative flex min-h-[150px] w-full flex-col items-center justify-center rounded-[4px] border-2 border-dashed transition-all ${
+      className={[
+        'relative flex min-h-[160px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed transition-all duration-300',
         isDrag
-          ? 'border-blue-600 bg-blue-50'
-          : validation._tag == 'Left'
-            ? 'border-red-600 bg-red-50'
-            : 'border-gray-200 bg-gray-50 hover:border-gray-300'
-      }`}
+          ? 'border-blue-500 bg-blue-50 ring-4 ring-blue-50'
+          : isError
+            ? 'border-red-300 bg-red-50 hover:border-red-400'
+            : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-50',
+      ].join(' ')}
     >
       <input
         type='file'
         multiple={isMultiple}
-        className='absolute inset-0 h-full w-full cursor-pointer opacity-0'
+        className='absolute inset-0 z-0 h-full w-full cursor-pointer opacity-0'
         onInput={(event) => dispatch({ _tag: 'AddFile', key, event })}
       />
-      <div className='pointer-events-none flex flex-col items-center gap-2'>
-        <div className='opacity-40'>
-          <img src='../../assets/icons/upload.svg' alt='upload' />
+      <div className='flex flex-col items-center gap-4 px-6 text-center'>
+        <div
+          className={[
+            'rounded-2xl p-3 transition-colors duration-200',
+            isDrag
+              ? 'bg-blue-500 text-white shadow-lg shadow-blue-200'
+              : 'bg-white text-slate-400 shadow-sm',
+          ].join(' ')}
+        >
+          <IconUpload />
         </div>
-        <div className='flex flex-col items-center'>
-          <p className='text-base font-medium text-gray-700'>
-            Click or drag file to this area to upload
+        <div className='flex flex-col gap-1.5'>
+          <p className='text-[15px] font-bold text-slate-700'>
+            {isDrag ? 'Drop to upload' : 'Click or drop files here'}
           </p>
-          <p className='text-sm text-gray-500'>
-            Support for a single or bulk upload. Strictly prohibit from
-            uploading company data or other band files
+          <p className='max-w-[240px] text-xs leading-relaxed font-medium text-slate-400'>
+            Support for {isMultiple ? 'multiple files' : 'single file'}. Max
+            size 10MB per file.
           </p>
         </div>
       </div>
@@ -547,77 +590,87 @@ export const defaultTextPillView = ({
   label,
   showValidation,
   isFocus,
-  validation,
   validationResult,
   autocomplete,
   allValues,
 }: CustomTextPillInputProps): JSX.Element => {
-  const inputElement = (
-    <div className='flex flex-wrap items-center gap-2 px-3 py-2'>
-      {pipe(
-        allValues,
-        A.mapWithIndex((index, val) => (
-          <div
-            key={index}
-            className='flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-sm'
-          >
-            <span>{val}</span>
-            <button
-              type='button'
-              className='text-gray-400 hover:text-gray-600'
-              onClick={() =>
+  const isError = validationResult._tag === 'Left' && showValidation
+  const isFloating = isFocus || allValues.length > 0 || currentValue !== ''
+  const errorMsg = isError ? O.some(validationResult.left) : O.none
+
+  return (
+    <div key={key} className='group flex w-full flex-col gap-1.5'>
+      {errorTooltipContainer(errorMsg, 'top', () =>
+        dispatch({ _tag: 'HideValidation', key }),
+      )}
+
+      <div className={getContainerClasses(isError, isFocus)}>
+        <p className={getLabelClasses(isError, isFocus, isFloating)}>{label}</p>
+        <div className='flex flex-wrap items-center gap-2 px-3 pt-6.5 pb-2'>
+          {pipe(
+            allValues,
+            A.mapWithIndex((index, val) => (
+              <div
+                key={index}
+                className='flex items-center gap-2 rounded-lg bg-slate-100 py-1.25 pr-1.5 pl-3 text-[13px] font-bold text-slate-700 shadow-xs transition-all hover:bg-slate-200 hover:text-slate-900'
+              >
+                <span>{val}</span>
+                <button
+                  type='button'
+                  className='flex h-5 w-5 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-white hover:text-red-500'
+                  onClick={() =>
+                    dispatch({
+                      _tag: 'TextPillMsg',
+                      key,
+                      subMsg: { _tag: 'RemovePill', index },
+                    })
+                  }
+                >
+                  <svg
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    strokeWidth='3'
+                    className='h-3 w-3'
+                  >
+                    <line x1='18' y1='6' x2='6' y2='18' />
+                    <line x1='6' y1='6' x2='18' y2='18' />
+                  </svg>
+                </button>
+              </div>
+            )),
+          )}
+          <input
+            className='min-w-[140px] grow bg-transparent px-1 py-2.25 font-medium text-slate-800 outline-none placeholder:text-slate-300'
+            value={currentValue}
+            onInput={(event) =>
+              dispatch({
+                _tag: 'TextPillMsg',
+                key,
+                subMsg: { _tag: 'UpdateTextPill', event },
+              })
+            }
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && currentValue.trim() !== '') {
+                event.preventDefault()
                 dispatch({
                   _tag: 'TextPillMsg',
                   key,
-                  subMsg: { _tag: 'RemovePill', index },
+                  subMsg: { _tag: 'AddPill', value: currentValue },
                 })
               }
-            >
-              ×
-            </button>
-          </div>
-        )),
-      )}
-      <input
-        className='min-w-[120px] grow outline-none'
-        value={currentValue}
-        onInput={(event) =>
-          dispatch({
-            _tag: 'TextPillMsg',
-            key,
-            subMsg: { _tag: 'UpdateTextPill', event },
-          })
-        }
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' && currentValue.trim() !== '') {
-            event.preventDefault()
-            dispatch({
-              _tag: 'TextPillMsg',
-              key,
-              subMsg: { _tag: 'AddPill', value: currentValue },
-            })
-          }
-        }}
-        onFocus={(_) => dispatch({ _tag: 'HandleFocus', key, isFocus: true })}
-        onBlur={(_) => dispatch({ _tag: 'HandleFocus', key, isFocus: false })}
-        placeholder={allValues.length === 0 ? 'Enter tags...' : ''}
-        autoComplete={autocompleteToString(autocomplete)}
-      />
+            }}
+            onFocus={(_) =>
+              dispatch({ _tag: 'HandleFocus', key, isFocus: true })
+            }
+            onBlur={(_) =>
+              dispatch({ _tag: 'HandleFocus', key, isFocus: false })
+            }
+            placeholder={allValues.length === 0 ? 'Add tag...' : ''}
+            autoComplete={autocompleteToString(autocomplete)}
+          />
+        </div>
+      </div>
     </div>
-  )
-
-  return inputBoxView<string[]>(
-    dispatch,
-    key,
-    {
-      label,
-      validation,
-      currentValue: allValues,
-      showValidation,
-      isFocus,
-    },
-    validationResult,
-    inputElement,
-    emptyEl(),
   )
 }
