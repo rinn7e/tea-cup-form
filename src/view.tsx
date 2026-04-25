@@ -37,6 +37,7 @@ import {
   type CheckboxType,
   type CheckboxTypeUiArg,
   CustomTextInputProps,
+  type CustomTextPillInputProps,
   type DropdownType,
   type DropdownTypeUiArg,
   type FileType,
@@ -46,9 +47,8 @@ import {
   type RadioChoice,
   type RadioType,
   type RadioTypeUiArg,
-  type TextType,
   type TextPillType,
-  type CustomTextPillInputProps,
+  type TextType,
   autocompleteToString,
   textInputVariantToString,
 } from './type'

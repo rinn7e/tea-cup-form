@@ -128,7 +128,6 @@ export type TextPillType = {
   allValues: string[]
   currentValue: string
   validation: (input: string[]) => Either<string, string[]>
-  // ^ Validate the current input field with another input field (ie. repeat-password)
   showValidation: boolean
   isTextarea: boolean
   autocomplete: boolean
