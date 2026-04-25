@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand-primary: #5cb85c;
+  --color-brand-secondary: #000;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+    @apply bg-gray-50;
+  }
+
+  body {
+    @apply relative text-base text-[#373a3c] antialiased;
+  }
+}
