@@ -201,6 +201,7 @@ export type CheckboxTypeUiArg = {
 
 export type CheckboxType = {
   _tag: 'CheckboxType'
+  label: string
   currentValues: CheckboxChoice[] // Use array of tuple instead of map to maintain the order.
   validation: (input: CheckboxChoice[]) => Either<string, CheckboxChoice[]>
   isMarkdown: boolean // Option to render the text with markdown
@@ -209,6 +210,7 @@ export type CheckboxType = {
 
 export const CheckboxTypeEq = EqClass.struct<CheckboxType>({
   _tag: S.Eq,
+  label: S.Eq,
   currentValues: A.getEq(CheckboxChoiceEq),
   validation: { equals: () => true },
   isMarkdown: { equals: () => true },
@@ -231,6 +233,7 @@ export type RadioTypeUiArg = {
 
 export type RadioType = {
   _tag: 'RadioType'
+  label: string
   choices: RadioChoice[]
   currentValue: Option<string>
   isMarkdown: boolean // Option to render the text with markdown
@@ -239,6 +242,7 @@ export type RadioType = {
 
 export const RadioTypeEq = EqClass.struct<RadioType>({
   _tag: S.Eq,
+  label: S.Eq,
   choices: A.getEq(RadioChoiceEq),
   currentValue: O.getEq(S.Eq),
   isMarkdown: { equals: () => true },
@@ -286,6 +290,7 @@ export type CalendarTypeUiArg = {
   dispatch: Dispatcher<Msg>
   fieldKey: string
   label: string
+  placeholder: string
   currentValue: Date | null
   isFocus: boolean
   validationResult: Either<string, Date | null>
@@ -296,6 +301,7 @@ export type CalendarTypeUiArg = {
 export type CalendarType = {
   _tag: 'CalendarType'
   label: string
+  placeholder: string
   currentValue: Date | null
   validation: (input: Date | null) => Either<string, Date | null>
   showValidation: boolean
@@ -305,7 +311,8 @@ export type CalendarType = {
 
 export const CalendarTypeEq = EqClass.struct<CalendarType>({
   _tag: S.Eq,
-  label: { equals: () => true },
+  label: S.Eq,
+  placeholder: S.Eq,
   currentValue: NullableEq(D.Eq),
   validation: { equals: () => true },
   showValidation: { equals: () => true },
@@ -313,25 +320,31 @@ export const CalendarTypeEq = EqClass.struct<CalendarType>({
   ui: { equals: () => true },
 })
 
+export type FileTypeUiArg = {
+  dispatch: Dispatcher<Msg>
+  fieldKey: string
+  label: string
+  validationResult: Either<string, File[]>
+  isMultiple: boolean
+  isDrag: boolean
+  showValidation: boolean
+}
+
 export type FileType = {
   _tag: 'FileType'
+  label: string
   currentValues: File[]
   isMultiple: boolean
   showValidation: boolean
   validation: (input: File[]) => Either<string, File[]>
-  ui?: (
-    dispatch: Dispatcher<Msg>,
-    key: string,
-    validation: Either<string, File[]>,
-    isMultiple: boolean,
-    isDrag: boolean,
-  ) => JSX.Element
+  ui?: (arg: FileTypeUiArg) => JSX.Element
 }
 
 export const FileEq: EqClass.Eq<File> = { equals: (a, b) => a.name === b.name }
 
 export const FileTypeEq = EqClass.struct<FileType>({
   _tag: S.Eq,
+  label: S.Eq,
   currentValues: A.getEq(FileEq),
   isMultiple: { equals: () => true },
   showValidation: B.Eq,

@@ -22,10 +22,11 @@ SOFTWARE. */
 import * as M from 'fp-ts/lib/Map'
 import * as S from 'fp-ts/lib/string'
 import { memo } from 'react'
-import 'react-datepicker/dist/react-datepicker.css'
+
+// import 'react-datepicker/dist/react-datepicker.css'
 
 // Custom CSS for calendar
-import './form.css'
+// import './form.css'
 import { PropEq, type Props } from './type'
 import { formView } from './view'
 

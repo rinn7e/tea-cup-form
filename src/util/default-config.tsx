@@ -36,6 +36,7 @@ import {
   type DropdownType,
   type DropdownTypeUiArg,
   type FileType,
+  type FileTypeUiArg,
   type Msg,
   type RadioChoice,
   type RadioType,
@@ -67,6 +68,7 @@ export const defaultCheckboxType = (
 ): CheckboxType => {
   return {
     _tag: 'CheckboxType',
+    label: 'Checkbox',
     currentValues,
     validation: (inputs) => E.right(inputs),
     isMarkdown: false,
@@ -81,6 +83,7 @@ export const defaultRadioType = (
 ): RadioType => {
   return {
     _tag: 'RadioType',
+    label: 'Radio',
     choices,
     currentValue,
     isMarkdown: true,
@@ -107,6 +110,7 @@ export const defaultCalendarType = (
 ): CalendarType => ({
   _tag: 'CalendarType',
   label: 'Birthday',
+  placeholder: 'Select date',
   currentValue: null,
   validation: (val) => E.right(val),
   showValidation: false,
@@ -115,15 +119,10 @@ export const defaultCalendarType = (
 })
 
 export const defaultFileType = (
-  inputUi?: (
-    dispatch: Dispatcher<Msg>,
-    key: string,
-    validation: Either<string, File[]>,
-    isMultiple: boolean,
-    isDrag: boolean,
-  ) => JSX.Element,
+  inputUi?: (arg: FileTypeUiArg) => JSX.Element,
 ): FileType => ({
   _tag: 'FileType',
+  label: 'Files',
   currentValues: [],
   isMultiple: false,
   showValidation: false,

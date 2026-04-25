@@ -21,14 +21,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
 react-datepicker {
-  z-index: 40;
+  z-index: 40 !important;
 }
 
 .react-datepicker__input-container > input {
-  padding-top: 22px;
-  padding-left: 12px;
-  padding-right: 12px;
-  padding-bottom: 6px;
+  padding: 0.75rem 1rem;
   outline: none;
   width: 100%;
   pointer-events: auto;
@@ -36,7 +33,7 @@ react-datepicker {
 }
 
 .react-datepicker-popper {
-  z-index: 40;
+  z-index: 40 !important;
   left: 25px;
 }
 

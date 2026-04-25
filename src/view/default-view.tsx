@@ -39,6 +39,7 @@ import {
   CustomTextInputProps,
   type CustomTextPillInputProps,
   type DropdownTypeUiArg,
+  type FileTypeUiArg,
   type Msg,
   type RadioTypeUiArg,
   autocompleteToString,
@@ -52,7 +53,7 @@ const CalendarInput = React.forwardRef<HTMLInputElement, any>((props, ref) => (
   <input
     {...props}
     ref={ref}
-    className='w-full bg-transparent px-4 pt-6.5 pb-2.5 font-medium text-slate-800 outline-none'
+    className='w-full bg-transparent px-4 py-3 font-medium text-slate-800 outline-none'
   />
 ))
 
@@ -163,23 +164,10 @@ const getContainerClasses = (isError: boolean, isFocus: boolean) =>
         : 'border-slate-200 hover:border-slate-300 bg-white shadow-xs',
   ].join(' ')
 
-const getLabelClasses = (
-  isError: boolean,
-  isFocus: boolean,
-  isFloating: boolean,
-) =>
+const getLabelClasses = (isError: boolean, isFocus: boolean) =>
   [
-    'pointer-events-none absolute z-10 px-4 transition-all duration-200',
-    isFloating
-      ? 'pt-2 text-[11px] font-semibold tracking-wide uppercase'
-      : 'pt-4 text-base',
-    isError
-      ? 'text-red-500'
-      : isFocus
-        ? 'text-blue-500'
-        : isFloating
-          ? 'text-slate-500'
-          : 'text-slate-400',
+    'text-sm font-bold tracking-tight mb-1 px-1',
+    isError ? 'text-red-500' : isFocus ? 'text-blue-500' : 'text-slate-600',
   ].join(' ')
 
 // Input box for text type
@@ -192,26 +180,28 @@ export const defaultTextView = ({
   showValidation,
   isFocus,
   validationResult,
+  placeholder,
   autocomplete,
   onKeyDown,
 }: CustomTextInputProps): JSX.Element => {
   const isError = validationResult._tag === 'Left' && showValidation
-  const isFloating = isFocus || currentValue !== ''
   const errorMsg = isError ? O.some(validationResult.left) : O.none
 
   return (
-    <div key={key} className='group flex w-full flex-col gap-1.5'>
+    <div key={key} className='group flex w-full flex-col gap-1'>
       {errorTooltipContainer(errorMsg, 'top', () =>
         dispatch({ _tag: 'HideValidation', key }),
       )}
 
+      {label !== '' && (
+        <label className={getLabelClasses(isError, isFocus)}>{label}</label>
+      )}
       <div className={getContainerClasses(isError, isFocus)}>
-        <p className={getLabelClasses(isError, isFocus, isFloating)}>{label}</p>
         <div className='flex flex-row items-center'>
           <input
-            style={{ paddingBottom: '10px', paddingTop: '26px' }}
             type={textInputVariantToString(variant)}
-            className='w-full bg-transparent px-4 font-medium text-slate-800 outline-none placeholder:text-slate-300'
+            className='w-full bg-transparent px-4 py-3 font-medium text-slate-800 outline-none placeholder:text-slate-300'
+            placeholder={placeholder}
             value={currentValue}
             onInput={(event) => dispatch({ _tag: 'UpdateForm', key, event })}
             onFocus={(_) =>
@@ -229,7 +219,7 @@ export const defaultTextView = ({
               return (
                 <button
                   type='button'
-                  className='mr-2 flex h-10 w-10 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus:outline-none'
+                  className='mr-2 flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus:outline-none'
                   onClick={(event) =>
                     dispatch({
                       _tag: 'SetRevealPassword',
@@ -349,6 +339,7 @@ export const defaultDropdownView = ({
   fieldKey,
   isFocus,
   choices,
+  placeholder,
   validationResult,
   showValidation,
 }: DropdownTypeUiArg) => {
@@ -357,18 +348,20 @@ export const defaultDropdownView = ({
   const errorMsg = isError ? O.some(validationResult.left) : O.none
 
   return (
-    <div key={fieldKey} className='group flex w-full flex-col gap-1.5'>
+    <div key={fieldKey} className='group flex w-full flex-col gap-1'>
       {errorTooltipContainer(errorMsg, 'top', () =>
         dispatch({ _tag: 'HideValidation', key: fieldKey }),
       )}
 
+      {label !== '' && (
+        <label className={getLabelClasses(isError, isFocus)}>{label}</label>
+      )}
       <div className={getContainerClasses(isError, isFocus)}>
-        <p className={getLabelClasses(isError, isFocus, isFloating)}>{label}</p>
         <div className='flex flex-row items-center'>
           <input
             id={mkIdFromString(label)}
-            style={{ paddingBottom: '10px', paddingTop: '26px' }}
-            className='w-full cursor-pointer bg-transparent px-4 font-medium text-slate-800 outline-none'
+            className='w-full cursor-pointer bg-transparent px-4 py-3 font-medium text-slate-800 outline-none placeholder:text-slate-300'
+            placeholder={placeholder}
             value={currentValue ? currentValue : ''}
             readOnly
             onKeyDown={(event) => event.preventDefault()}
@@ -474,23 +467,25 @@ export const defaultCalendarView = ({
   dispatch,
   fieldKey,
   label,
+  placeholder,
   currentValue,
   isFocus,
   validationResult,
   showValidation,
 }: CalendarTypeUiArg) => {
   const isError = validationResult._tag === 'Left' && showValidation
-  const isFloating = isFocus || currentValue !== null
   const errorMsg = isError ? O.some(validationResult.left) : O.none
 
   return (
-    <div key={fieldKey} className='group flex w-full flex-col gap-1.5'>
+    <div key={fieldKey} className='group flex w-full flex-col gap-1'>
       {errorTooltipContainer(errorMsg, 'top', () =>
         dispatch({ _tag: 'HideValidation', key: fieldKey }),
       )}
 
+      {label !== '' && (
+        <label className={getLabelClasses(isError, isFocus)}>{label}</label>
+      )}
       <div className={getContainerClasses(isError, isFocus)}>
-        <p className={getLabelClasses(isError, isFocus, isFloating)}>{label}</p>
         <div className='flex flex-row items-center'>
           <div className='w-full' onClick={(e) => e.stopPropagation()}>
             <DatePicker
@@ -499,7 +494,7 @@ export const defaultCalendarView = ({
               scrollableYearDropdown
               yearDropdownItemNumber={100}
               selected={currentValue}
-              placeholderText={isFocus ? 'DD.MM.YYYY' : ''}
+              placeholderText={placeholder}
               dateFormat='dd.MM.yyyy'
               customInput={<CalendarInput />}
               onCalendarOpen={() =>
@@ -532,51 +527,59 @@ export const defaultCalendarView = ({
   )
 }
 
-export const defaultFileView = (
-  dispatch: Dispatcher<Msg>,
-  key: string,
-  validation: Either<string, File[]>,
-  isMultiple: boolean,
-  isDrag: boolean,
-) => {
-  const isError = validation._tag === 'Left'
+export const defaultFileView = ({
+  dispatch,
+  fieldKey,
+  label,
+  validationResult,
+  isMultiple,
+  isDrag,
+  showValidation,
+}: FileTypeUiArg) => {
+  const isError = validationResult._tag === 'Left' && showValidation
+  const isFocus = isDrag
 
   return (
-    <div
-      className={[
-        'relative flex min-h-[160px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed transition-all duration-300',
-        isDrag
-          ? 'border-blue-500 bg-blue-50 ring-4 ring-blue-50'
-          : isError
-            ? 'border-red-300 bg-red-50 hover:border-red-400'
-            : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-50',
-      ].join(' ')}
-    >
-      <input
-        type='file'
-        multiple={isMultiple}
-        className='absolute inset-0 z-0 h-full w-full cursor-pointer opacity-0'
-        onInput={(event) => dispatch({ _tag: 'AddFile', key, event })}
-      />
-      <div className='flex flex-col items-center gap-4 px-6 text-center'>
-        <div
-          className={[
-            'rounded-2xl p-3 transition-colors duration-200',
-            isDrag
-              ? 'bg-blue-500 text-white shadow-lg shadow-blue-200'
-              : 'bg-white text-slate-400 shadow-sm',
-          ].join(' ')}
-        >
-          <IconUpload />
-        </div>
-        <div className='flex flex-col gap-1.5'>
-          <p className='text-[15px] font-bold text-slate-700'>
-            {isDrag ? 'Drop to upload' : 'Click or drop files here'}
-          </p>
-          <p className='max-w-[240px] text-xs leading-relaxed font-medium text-slate-400'>
-            Support for {isMultiple ? 'multiple files' : 'single file'}. Max
-            size 10MB per file.
-          </p>
+    <div className='flex w-full flex-col gap-1'>
+      {label !== '' && (
+        <label className={getLabelClasses(isError, false)}>{label}</label>
+      )}
+      <div
+        className={[
+          'relative flex min-h-[160px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed transition-all duration-300',
+          isDrag
+            ? 'border-blue-500 bg-blue-50 ring-4 ring-blue-50'
+            : isError
+              ? 'border-red-300 bg-red-50 hover:border-red-400'
+              : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-50',
+        ].join(' ')}
+      >
+        <input
+          type='file'
+          multiple={isMultiple}
+          className='absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0'
+          onInput={(event) => dispatch({ _tag: 'AddFile', key: fieldKey, event })}
+        />
+        <div className='flex flex-col items-center gap-4 px-6 text-center'>
+          <div
+            className={[
+              'rounded-2xl p-3 transition-colors duration-200',
+              isDrag
+                ? 'bg-blue-500 text-white shadow-lg shadow-blue-200'
+                : 'bg-white text-slate-400 shadow-sm',
+            ].join(' ')}
+          >
+            <IconUpload />
+          </div>
+          <div className='flex flex-col gap-1.5'>
+            <p className='text-[15px] font-bold text-slate-700'>
+              {isDrag ? 'Drop to upload' : 'Click or drop files here'}
+            </p>
+            <p className='max-w-[240px] text-xs leading-relaxed font-medium text-slate-400'>
+              Support for {isMultiple ? 'multiple files' : 'single file'}. Max
+              size 10MB per file.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -591,6 +594,7 @@ export const defaultTextPillView = ({
   showValidation,
   isFocus,
   validationResult,
+  placeholder,
   autocomplete,
   allValues,
 }: CustomTextPillInputProps): JSX.Element => {
@@ -599,20 +603,21 @@ export const defaultTextPillView = ({
   const errorMsg = isError ? O.some(validationResult.left) : O.none
 
   return (
-    <div key={key} className='group flex w-full flex-col gap-1.5'>
+    <div key={key} className='group flex w-full flex-col gap-1'>
       {errorTooltipContainer(errorMsg, 'top', () =>
         dispatch({ _tag: 'HideValidation', key }),
       )}
-
+      {label !== '' && (
+        <label className={getLabelClasses(isError, isFocus)}>{label}</label>
+      )}
       <div className={getContainerClasses(isError, isFocus)}>
-        <p className={getLabelClasses(isError, isFocus, isFloating)}>{label}</p>
-        <div className='flex flex-wrap items-center gap-2 px-3 pt-6.5 pb-2'>
+        <div className='flex flex-wrap items-center gap-2 px-3 py-2'>
           {pipe(
             allValues,
             A.mapWithIndex((index, val) => (
               <div
                 key={index}
-                className='flex items-center gap-2 rounded-lg bg-slate-100 py-1.25 pr-1.5 pl-3 text-[13px] font-bold text-slate-700 shadow-xs transition-all hover:bg-slate-200 hover:text-slate-900'
+                className='flex items-center gap-2 rounded-lg bg-slate-100 py-1 pr-1.5 pl-3 text-[13px] font-bold text-slate-700 shadow-xs transition-all hover:bg-slate-200 hover:text-slate-900'
               >
                 <span>{val}</span>
                 <button
@@ -641,7 +646,7 @@ export const defaultTextPillView = ({
             )),
           )}
           <input
-            className='min-w-[140px] grow bg-transparent px-1 py-2.25 font-medium text-slate-800 outline-none placeholder:text-slate-300'
+            className='min-w-[140px] grow bg-transparent px-1 py-1.5 font-medium text-slate-800 outline-none placeholder:text-slate-300'
             value={currentValue}
             onInput={(event) =>
               dispatch({
@@ -666,7 +671,7 @@ export const defaultTextPillView = ({
             onBlur={(_) =>
               dispatch({ _tag: 'HandleFocus', key, isFocus: false })
             }
-            placeholder={allValues.length === 0 ? 'Add tag...' : ''}
+            placeholder={placeholder}
             autoComplete={autocompleteToString(autocomplete)}
           />
         </div>

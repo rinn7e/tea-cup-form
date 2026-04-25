@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @source '../../../src/**/*.{ts,tsx}';
+@import '../../../src/form.css';
 
 @theme {
   --color-brand-primary: #5cb85c;

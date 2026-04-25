@@ -133,6 +133,7 @@ export const formView = (
         dispatch,
         fieldKey: key,
         label: val.label,
+        placeholder: val.placeholder,
         currentValue: val.currentValue,
         isFocus: val.isFocus,
         validationResult,
@@ -170,8 +171,13 @@ export const formView = (
         }),
       )
       return (
-        <div id={val._tag} className='flex flex-col gap-[16px]'>
-          {results}
+        <div id={val._tag} className='flex flex-col gap-1'>
+          {val.label !== '' && (
+            <label className='mb-1 px-1 text-sm font-bold tracking-tight text-slate-600'>
+              {val.label}
+            </label>
+          )}
+          <div className='flex flex-col gap-1'>{results}</div>
         </div>
       )
     }
@@ -192,8 +198,13 @@ export const formView = (
         }),
       )
       return (
-        <div id={val._tag} className='flex flex-col gap-[16px]'>
-          {results}
+        <div id={val._tag} className='flex flex-col gap-1'>
+          {val.label !== '' && (
+            <label className='mb-1 px-1 text-sm font-bold tracking-tight text-slate-600'>
+              {val.label}
+            </label>
+          )}
+          <div className='flex flex-col gap-1'>{results}</div>
         </div>
       )
     }
@@ -245,13 +256,15 @@ export const formView = (
 
       const validationResult = val.validation(val.currentValues)
       const view = val.ui ? val.ui : defaultFileView
-      const dropZoneView = view(
+      const dropZoneView = view({
         dispatch,
-        key,
+        fieldKey: key,
+        label: val.label,
         validationResult,
-        val.isMultiple,
-        model.isDrag,
-      )
+        isMultiple: val.isMultiple,
+        isDrag: model.isDrag,
+        showValidation: val.showValidation,
+      })
 
       const showValidation =
         validationResult._tag == 'Left' && val.showValidation
