@@ -32,10 +32,10 @@ import { exec, limitDecimal2Digit, modifyAtIfExist } from './util/common'
 import { runValidationAndLink } from './validation'
 import {
   defaultCalendarView,
-  defaultCheckboxView,
+  defaultCheckboxesView,
   defaultDropdownView,
   defaultFileView,
-  defaultRadioView,
+  defaultRadiosView,
   defaultTextPillView,
   defaultTextView,
 } from './view/default-view'
@@ -158,55 +158,25 @@ export const formView = (
       })
     }
     case 'CheckboxType': {
-      const results = pipe(
-        val.currentValues,
-        A.map((checkboxChoice) => {
-          const view = val.ui ? val.ui : defaultCheckboxView
-          return view({
-            dispatch,
-            fieldKey: key,
-            checkboxChoice,
-            isMarkdown: val.isMarkdown,
-          })
-        }),
-      )
-      return (
-        <div id={val._tag} className='flex flex-col gap-1'>
-          {val.label !== '' && (
-            <label className='mb-1 px-1 text-sm font-bold tracking-tight text-slate-600'>
-              {val.label}
-            </label>
-          )}
-          <div className='flex flex-col gap-1'>{results}</div>
-        </div>
-      )
+      const view = val.ui ? val.ui : defaultCheckboxesView
+      return view({
+        dispatch,
+        fieldKey: key,
+        label: val.label,
+        currentValues: val.currentValues,
+        isMarkdown: val.isMarkdown,
+      })
     }
     case 'RadioType': {
-      const results = pipe(
-        val.choices,
-        A.map((radioChoice) => {
-          const isActive =
-            val.currentValue._tag === 'Some' &&
-            val.currentValue.value === radioChoice.key
-          const view = val.ui ? val.ui : defaultRadioView
-          return view({
-            dispatch,
-            fieldKey: key,
-            radioChoice,
-            isActive,
-          })
-        }),
-      )
-      return (
-        <div id={val._tag} className='flex flex-col gap-1'>
-          {val.label !== '' && (
-            <label className='mb-1 px-1 text-sm font-bold tracking-tight text-slate-600'>
-              {val.label}
-            </label>
-          )}
-          <div className='flex flex-col gap-1'>{results}</div>
-        </div>
-      )
+      const view = val.ui ? val.ui : defaultRadiosView
+      return view({
+        dispatch,
+        fieldKey: key,
+        label: val.label,
+        choices: val.choices,
+        currentValue: val.currentValue,
+        isMarkdown: val.isMarkdown,
+      })
     }
 
     case 'FileType': {

@@ -35,13 +35,15 @@ import { Dispatcher } from 'tea-cup-fp'
 import { errorTooltipContainer } from '../error-tooltip/helper'
 import {
   type CalendarTypeUiArg,
-  type CheckboxTypeUiArg,
-  CustomTextInputProps,
-  type CustomTextPillInputProps,
+  type CheckboxesTypeUiArg,
+  type CheckboxChoice,
+  TextTypeUiArg,
+  type TextPillTypeUiArg,
   type DropdownTypeUiArg,
   type FileTypeUiArg,
   type Msg,
-  type RadioTypeUiArg,
+  type RadiosTypeUiArg,
+  type RadioChoice,
   autocompleteToString,
   textInputVariantToString,
 } from '../type'
@@ -183,7 +185,7 @@ export const defaultTextView = ({
   placeholder,
   autocomplete,
   onKeyDown,
-}: CustomTextInputProps): JSX.Element => {
+}: TextTypeUiArg): JSX.Element => {
   const isError = validationResult._tag === 'Left' && showValidation
   const errorMsg = isError ? O.some(validationResult.left) : O.none
 
@@ -264,6 +266,13 @@ export const radioView = (
   )
 }
 
+type CheckboxTypeUiArg = {
+  dispatch: Dispatcher<Msg>
+  fieldKey: string
+  checkboxChoice: CheckboxChoice
+  isMarkdown: boolean
+}
+
 export const defaultCheckboxView = (arg: CheckboxTypeUiArg) => {
   const [key, val] = arg.checkboxChoice
   return (
@@ -304,6 +313,37 @@ export const defaultCheckboxView = (arg: CheckboxTypeUiArg) => {
   )
 }
 
+export const defaultCheckboxesView = ({
+  dispatch,
+  fieldKey,
+  label,
+  currentValues,
+  isMarkdown,
+}: CheckboxesTypeUiArg) => (
+  <div id='CheckboxType' className='flex flex-col gap-1'>
+    {label !== '' && (
+      <label className='mb-1 px-1 text-sm font-bold tracking-tight text-slate-600'>
+        {label}
+      </label>
+    )}
+    <div className='flex flex-col gap-1'>
+      {pipe(
+        currentValues,
+        A.map((checkboxChoice) =>
+          defaultCheckboxView({ dispatch, fieldKey, checkboxChoice, isMarkdown }),
+        ),
+      )}
+    </div>
+  </div>
+)
+
+type RadioTypeUiArg = {
+  dispatch: Dispatcher<Msg>
+  fieldKey: string
+  radioChoice: RadioChoice
+  isActive: boolean
+}
+
 export const defaultRadioView = (arg: RadioTypeUiArg) => {
   return (
     <div
@@ -331,6 +371,33 @@ export const defaultRadioView = (arg: RadioTypeUiArg) => {
     </div>
   )
 }
+
+export const defaultRadiosView = ({
+  dispatch,
+  fieldKey,
+  label,
+  choices,
+  currentValue,
+  isMarkdown,
+}: RadiosTypeUiArg) => (
+  <div id='RadioType' className='flex flex-col gap-1'>
+    {label !== '' && (
+      <label className='mb-1 px-1 text-sm font-bold tracking-tight text-slate-600'>
+        {label}
+      </label>
+    )}
+    <div className='flex flex-col gap-1'>
+      {pipe(
+        choices,
+        A.map((radioChoice) => {
+          const isActive =
+            currentValue._tag === 'Some' && currentValue.value === radioChoice.key
+          return defaultRadioView({ dispatch, fieldKey, radioChoice, isActive })
+        }),
+      )}
+    </div>
+  </div>
+)
 
 export const defaultDropdownView = ({
   dispatch,
@@ -597,7 +664,7 @@ export const defaultTextPillView = ({
   placeholder,
   autocomplete,
   allValues,
-}: CustomTextPillInputProps): JSX.Element => {
+}: TextPillTypeUiArg): JSX.Element => {
   const isError = validationResult._tag === 'Left' && showValidation
   const isFloating = isFocus || allValues.length > 0 || currentValue !== ''
   const errorMsg = isError ? O.some(validationResult.left) : O.none

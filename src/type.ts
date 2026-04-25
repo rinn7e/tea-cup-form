@@ -97,10 +97,10 @@ export type TextType = {
   onKeyDown?: (
     event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void
-  ui?: (props: CustomTextInputProps) => JSX.Element
+  ui?: (props: TextTypeUiArg) => JSX.Element
 }
 
-export type CustomTextInputProps = {
+export type TextTypeUiArg = {
   key: string
   label: string
   isFocus: boolean
@@ -132,7 +132,7 @@ export type TextPillType = {
   isTextarea: boolean
   autocomplete: boolean
   isFocus: boolean
-  ui?: (props: CustomTextPillInputProps) => JSX.Element
+  ui?: (props: TextPillTypeUiArg) => JSX.Element
 }
 
 export const TextPillTypeEq = EqClass.struct<TextPillType>({
@@ -149,7 +149,7 @@ export const TextPillTypeEq = EqClass.struct<TextPillType>({
   ui: { equals: () => true },
 })
 
-export type CustomTextPillInputProps = {
+export type TextPillTypeUiArg = {
   key: string
   label: string
   isFocus: boolean
@@ -192,10 +192,11 @@ export const autocompleteToString = (val: boolean) => {
 export type CheckboxChoice = [string, boolean]
 export const CheckboxChoiceEq = EqClass.tuple(S.Eq, B.Eq)
 
-export type CheckboxTypeUiArg = {
+export type CheckboxesTypeUiArg = {
   dispatch: Dispatcher<Msg>
   fieldKey: string
-  checkboxChoice: CheckboxChoice
+  label: string
+  currentValues: CheckboxChoice[]
   isMarkdown: boolean
 }
 
@@ -205,7 +206,7 @@ export type CheckboxType = {
   currentValues: CheckboxChoice[] // Use array of tuple instead of map to maintain the order.
   validation: (input: CheckboxChoice[]) => Either<string, CheckboxChoice[]>
   isMarkdown: boolean // Option to render the text with markdown
-  ui?: (arg: CheckboxTypeUiArg) => JSX.Element
+  ui?: (arg: CheckboxesTypeUiArg) => JSX.Element
 }
 
 export const CheckboxTypeEq = EqClass.struct<CheckboxType>({
@@ -224,11 +225,13 @@ export const RadioChoiceEq = EqClass.struct<RadioChoice>({
   desc: S.Eq,
 })
 
-export type RadioTypeUiArg = {
+export type RadiosTypeUiArg = {
   dispatch: Dispatcher<Msg>
   fieldKey: string
-  radioChoice: RadioChoice
-  isActive: boolean
+  label: string
+  choices: RadioChoice[]
+  currentValue: Option<string>
+  isMarkdown: boolean
 }
 
 export type RadioType = {
@@ -237,7 +240,7 @@ export type RadioType = {
   choices: RadioChoice[]
   currentValue: Option<string>
   isMarkdown: boolean // Option to render the text with markdown
-  ui?: (arg: RadioTypeUiArg) => JSX.Element
+  ui?: (arg: RadiosTypeUiArg) => JSX.Element
 }
 
 export const RadioTypeEq = EqClass.struct<RadioType>({
@@ -497,7 +500,7 @@ export type Msg =
 
 // helper types
 
-// export type CustomTextInputProps = {
+// export type TextTypeUiArg = {
 //   key: string
 //   label: string
 //   isFocus: boolean

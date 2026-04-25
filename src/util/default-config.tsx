@@ -30,9 +30,9 @@ import {
   type CalendarTypeUiArg,
   type CheckboxChoice,
   type CheckboxType,
-  type CheckboxTypeUiArg,
-  CustomTextInputProps,
-  type CustomTextPillInputProps,
+  type CheckboxesTypeUiArg,
+  TextTypeUiArg,
+  type TextPillTypeUiArg,
   type DropdownType,
   type DropdownTypeUiArg,
   type FileType,
@@ -40,13 +40,13 @@ import {
   type Msg,
   type RadioChoice,
   type RadioType,
-  type RadioTypeUiArg,
+  type RadiosTypeUiArg,
   type TextPillType,
   type TextType,
 } from '../type'
 
 export const defaultTextType = (
-  inputUi?: (props: CustomTextInputProps) => JSX.Element,
+  inputUi?: (props: TextTypeUiArg) => JSX.Element,
 ): TextType => ({
   _tag: 'TextType',
   placeholder: 'Username',
@@ -64,7 +64,7 @@ export const defaultTextType = (
 
 export const defaultCheckboxType = (
   currentValues: CheckboxChoice[],
-  inputUi?: (arg: CheckboxTypeUiArg) => JSX.Element,
+  inputUi?: (arg: CheckboxesTypeUiArg) => JSX.Element,
 ): CheckboxType => {
   return {
     _tag: 'CheckboxType',
@@ -79,7 +79,7 @@ export const defaultCheckboxType = (
 export const defaultRadioType = (
   choices: RadioChoice[],
   currentValue: Option<string>,
-  inputUi?: (arg: RadioTypeUiArg) => JSX.Element,
+  inputUi?: (arg: RadiosTypeUiArg) => JSX.Element,
 ): RadioType => {
   return {
     _tag: 'RadioType',
@@ -131,7 +131,7 @@ export const defaultFileType = (
 })
 
 export const defaultTextPillType = (
-  inputUi?: (props: CustomTextPillInputProps) => JSX.Element,
+  inputUi?: (props: TextPillTypeUiArg) => JSX.Element,
 ): TextPillType => ({
   _tag: 'TextPillType',
   placeholder: 'Tags',
