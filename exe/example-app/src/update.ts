@@ -81,6 +81,7 @@ export const init = (): [Model, Cmd<Msg>] => {
       {
         ...Form.defaultDropdownType(),
         label: 'Country',
+        choices: ['Cambodia', 'Russia', 'USA'],
         validation: (val: string | null) =>
           val === null ? E.left('Please select a country') : E.right(val),
       },

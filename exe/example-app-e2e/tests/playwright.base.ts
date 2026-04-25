@@ -1,4 +1,4 @@
-import { type PlaywrightTestConfig, devices } from '@playwright/test';
+import { type PlaywrightTestConfig, devices } from '@playwright/test'
 
 export const baseConfig: PlaywrightTestConfig = {
   testDir: './tests',
@@ -13,7 +13,7 @@ export const baseConfig: PlaywrightTestConfig = {
     screenshot: 'only-on-failure',
     actionTimeout: 5_000,
     navigationTimeout: 10_000,
-    baseURL: process.env.BASE_URL || 'http://localhost:5173'
+    baseURL: process.env.BASE_URL || 'http://localhost:5173',
   },
   expect: {
     timeout: 5_000,
@@ -24,4 +24,4 @@ export const baseConfig: PlaywrightTestConfig = {
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-};
+}
