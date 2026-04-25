@@ -24,4 +24,10 @@ export const baseConfig: PlaywrightTestConfig = {
       use: { ...devices['Desktop Chrome'] },
     },
   ],
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:5173',
+    cwd: '../example-app',
+    reuseExistingServer: !process.env.CI,
+  },
 }
